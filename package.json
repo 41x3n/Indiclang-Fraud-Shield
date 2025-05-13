@@ -1,0 +1,26 @@
+{
+    "name": "indiclang-fraud-shield",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "build": "pnpm -r run build",
+        "dev": "concurrently \"pnpm --filter hello-1 run dev\" \"pnpm --filter hello-2 run dev\"",
+        "start": "nodemon --watch apps/functions --ext ts --exec \"ts-node dev.ts\""
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "packageManager": "pnpm@10.10.0",
+    "dependencies": {
+        "express": "^5.1.0"
+    },
+    "devDependencies": {
+        "@google-cloud/functions-framework": "^4.0.0",
+        "@types/express": "^5.0.1",
+        "concurrently": "^9.1.2",
+        "nodemon": "^3.1.10",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.8.3"
+    }
+}

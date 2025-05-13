@@ -1,0 +1,9 @@
+.deploy_template: &deploy_template
+    image: node:20-alpine
+    before_script:
+        - corepack enable
+        - pnpm install --frozen-lockfile
+        - echo "$GCP_SA_KEY" > gcp-key.json
+        - gcloud auth activate-service-account --key-file=gcp-key.json
+        - gcloud config set project "$GCP_PROJECT_ID"
+        - gcloud config set functions/region "$GCP_REGION"

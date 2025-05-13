@@ -1,0 +1,33 @@
+deploy_staging_hello2:
+  <<: *deploy_template
+  stage: deploy
+  environment:
+    name: staging/hello-2
+  script:
+    - gcloud functions deploy hello-2 \
+        --entry-point=default \
+        --runtime=nodejs20 \
+        --trigger-http \
+        --source=apps/functions/hello-2 \
+        --allow-unauthenticated
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "staging"'
+      changes:
+        - apps/functions/hello-2/**
+
+deploy_production_hello2:
+  <<: *deploy_template
+  stage: deploy
+  environment:
+    name: production/hello-2
+  script:
+    - gcloud functions deploy hello-2 \
+        --entry-point=default \
+        --runtime=nodejs20 \
+        --trigger-http \
+        --source=apps/functions/hello-2 \
+        --allow-unauthenticated
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "production"'
+      changes:
+        - apps/functions/hello-2/**
