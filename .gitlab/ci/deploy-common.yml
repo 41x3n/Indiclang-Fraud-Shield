@@ -1,9 +1,29 @@
-.deploy_template: &deploy_template
-    image: node:20-alpine
+.deploy_function_template:
+    image: node:20-bullseye
     before_script:
-        - corepack enable
+        # Install Google Cloud SDK using curl + zip (no apt needed)
+        - curl -sSL https://sdk.cloud.google.com | bash
+        - export PATH="$HOME/google-cloud-sdk/bin:$PATH"
+
+        # Install pnpm
+        - npm install -g pnpm
+
+        # Install dependencies
         - pnpm install --frozen-lockfile
-        - echo "$GCP_SA_KEY" > gcp-key.json
+
+        # Select environment
+        - |
+            if [[ "$CI_COMMIT_BRANCH" == "staging" ]]; then
+              cp "$GCP_SA_KEY_STAGING" gcp-key.json
+              export GCP_PROJECT_ID=$GCP_PROJECT_ID_STAGING
+            elif [[ "$CI_COMMIT_BRANCH" == "production" ]]; then
+              cp "$GCP_SA_KEY_PROD" gcp-key.json
+              export GCP_PROJECT_ID=$GCP_PROJECT_ID_PROD
+            else
+              echo "❌ Unknown branch: $CI_COMMIT_BRANCH"
+              exit 1
+            fi
+
         - gcloud auth activate-service-account --key-file=gcp-key.json
         - gcloud config set project "$GCP_PROJECT_ID"
         - gcloud config set functions/region "$GCP_REGION"

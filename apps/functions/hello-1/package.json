@@ -2,8 +2,9 @@
     "name": "hello-1",
     "version": "1.0.0",
     "description": "",
-    "main": "index.js",
+    "main": "dist/index.js",
     "scripts": {
+        "gcp-build": "tsc",
         "build": "tsc",
         "dev": "functions-framework --target=defaultHandler --port=8081 --source=dist"
     },

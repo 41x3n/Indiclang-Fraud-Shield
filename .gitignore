@@ -5,3 +5,4 @@ coverage
 *.env
 *.tsbuildinfo
 *-key.json
+.gcloudignore

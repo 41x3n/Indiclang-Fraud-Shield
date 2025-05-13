@@ -2,7 +2,7 @@
     "name": "hello-2",
     "version": "1.0.0",
     "description": "",
-    "main": "index.js",
+    "main": "dist/index.js",
     "scripts": {
         "build": "tsc",
         "dev": "functions-framework --target=defaultHandler --port=8082 --source=dist"
