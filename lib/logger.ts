@@ -1,30 +1,14 @@
-type LogLevel = 'info' | 'warn' | 'error' | 'debug';
+import winston from 'winston';
 
-interface LogOptions {
-    label?: string;
-    metadata?: Record<string, unknown>;
-}
+const logger = winston.createLogger({
+    level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
+    format: winston.format.combine(winston.format.timestamp(), winston.format.json()),
+    defaultMeta: { service: 'fraud-shield' },
+    transports: [
+        new winston.transports.Console({
+            format: winston.format.combine(winston.format.colorize(), winston.format.simple()),
+        }),
+    ],
+});
 
-function formatLog(level: LogLevel, message: string, options?: LogOptions) {
-    const timestamp = new Date().toISOString();
-    const label = options?.label ? `[${options.label}]` : '';
-    const meta = options?.metadata ? JSON.stringify(options.metadata) : '';
-    return `${timestamp} ${label} ${level.toUpperCase()}: ${message} ${meta}`;
-}
-
-export const logger = {
-    info(message: string, options?: LogOptions) {
-        console.info(formatLog('info', message, options));
-    },
-    warn(message: string, options?: LogOptions) {
-        console.warn(formatLog('warn', message, options));
-    },
-    error(message: string, options?: LogOptions) {
-        console.error(formatLog('error', message, options));
-    },
-    debug(message: string, options?: LogOptions) {
-        if (process.env.NODE_ENV !== 'production') {
-            console.debug(formatLog('debug', message, options));
-        }
-    },
-};
+export { logger };

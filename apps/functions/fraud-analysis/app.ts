@@ -1,12 +1,7 @@
 import express from 'express';
 import { Express } from 'express';
 
-import {
-    verifyApiKey,
-    responseFormatter,
-    errorHandler,
-    requestLogger,
-} from '../../../lib/middleware';
+import { requestLogger, responseFormatter, verifyApiKey } from '../../../lib/middleware';
 
 /**
  * Sets up the Express application with common middleware and basic routes
@@ -37,9 +32,6 @@ export function setupApp(): Express {
             description: 'This Service analyzes messages for potential fraud.',
         });
     });
-
-    // Add error handling middleware at the end
-    app.use(errorHandler);
 
     return app;
 }

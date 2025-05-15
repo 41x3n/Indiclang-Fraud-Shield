@@ -1,5 +1,5 @@
-import express from 'express';
 import { HttpFunction } from '@google-cloud/functions-framework';
+import express from 'express';
 
 const app = express();
 

@@ -1,26 +1,23 @@
-import { Request, Response, NextFunction } from 'express';
+import { NextFunction, Request, Response } from 'express';
+import { StatusCodes } from 'http-status-codes';
+
 import { ErrorCode } from '../../types';
+import { throwFormattedError } from '../error';
 
 export function verifyApiKey(req: Request, _res: Response, next: NextFunction) {
     const apiKey = req.header('x-api-key');
     const expectedKey = process.env.API_KEY;
 
     if (apiKey === undefined) {
-        const error = new Error('No API key provided');
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (error as any).statusCode = 401;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (error as any).code = ErrorCode.MISSING_API_KEY;
-        throw error;
+        throwFormattedError(
+            'No API key provided',
+            StatusCodes.UNAUTHORIZED,
+            ErrorCode.MISSING_API_KEY,
+        );
     }
 
     if (apiKey !== expectedKey) {
-        const error = new Error('Unauthorized');
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (error as any).statusCode = 401;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (error as any).code = ErrorCode.INVALID_API_KEY;
-        throw error;
+        throwFormattedError('Unauthorized', StatusCodes.UNAUTHORIZED, ErrorCode.INVALID_API_KEY);
     }
 
     next();

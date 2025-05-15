@@ -1,10 +1,11 @@
-import { Request, Response, NextFunction } from 'express';
+import { NextFunction, Request, Response } from 'express';
+import { StatusCodes } from 'http-status-codes';
+
 import { ApiResponse, ErrorCode } from '../../types';
 
 export function responseFormatter(req: Request, res: Response, next: NextFunction) {
     const oldJson = res.json;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     res.json = function (payload: any) {
         // Don't rewrap if payload already has `statusCode` + `error` and no `data`
         const looksFormattedError =
@@ -19,9 +20,8 @@ export function responseFormatter(req: Request, res: Response, next: NextFunctio
         }
 
         const statusCode = res.statusCode;
-        const isError = statusCode >= 400;
+        const isError = statusCode >= StatusCodes.BAD_REQUEST;
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const response: ApiResponse<any> = {
             statusCode,
             data: isError ? null : payload,

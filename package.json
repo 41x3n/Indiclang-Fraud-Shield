@@ -17,7 +17,10 @@
     "packageManager": "pnpm@10.10.0",
     "dependencies": {
         "express": "^5.1.0",
-        "uuid": "^11.1.0"
+        "http-status-codes": "^2.3.0",
+        "uuid": "^11.1.0",
+        "winston": "^3.17.0",
+        "zod": "^3.24.4"
     },
     "devDependencies": {
         "@google-cloud/functions-framework": "^4.0.0",
@@ -27,6 +30,7 @@
         "concurrently": "^9.1.2",
         "dotenv": "^16.5.0",
         "eslint": "^9.26.0",
+        "eslint-plugin-simple-import-sort": "^12.1.1",
         "eslint-plugin-unused-imports": "^4.1.4",
         "nodemon": "^3.1.10",
         "prettier": "^3.5.3",

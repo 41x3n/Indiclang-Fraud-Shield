@@ -1,7 +1,9 @@
+import { StatusCodes } from 'http-status-codes';
+
 import { ErrorPayload } from './errors';
 
 export interface ApiResponse<T> {
-    statusCode: number;
+    statusCode: StatusCodes;
     data: T | null;
     error: ErrorPayload | null;
 }

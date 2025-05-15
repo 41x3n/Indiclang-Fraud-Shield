@@ -1,6 +1,7 @@
-import { Request, Response, NextFunction } from 'express';
-import { logger } from '../logger';
+import { NextFunction, Request, Response } from 'express';
 import { v4 as uuidv4 } from 'uuid';
+
+import { logger } from '../logger';
 
 const SENSITIVE_HEADERS = ['authorization', 'cookie', 'x-api-key'];
 
