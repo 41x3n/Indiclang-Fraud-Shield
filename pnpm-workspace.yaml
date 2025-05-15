@@ -1,2 +1,4 @@
 packages:
-  - "apps/functions/*"
+    - 'apps/functions/*'
+    - 'lib'
+    - 'types'

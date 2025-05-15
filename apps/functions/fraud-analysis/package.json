@@ -1,0 +1,22 @@
+{
+    "name": "fraud-analysis",
+    "version": "1.0.0",
+    "description": "",
+    "main": "dist/index.js",
+    "scripts": {
+        "build": "tsc",
+        "dev": "functions-framework --target=defaultHandler --port=8083 --source=dist"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "packageManager": "pnpm@10.10.0",
+    "dependencies": {
+        "express": "^5.1.0"
+    },
+    "devDependencies": {
+        "@google-cloud/functions-framework": "^4.0.0",
+        "@types/express": "^5.0.1",
+        "typescript": "^5.8.3"
+    }
+}

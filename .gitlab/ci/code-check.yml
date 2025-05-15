@@ -1,0 +1,10 @@
+code_lint:
+    stage: validate
+    image: node:20
+    before_script:
+        - corepack enable
+        - pnpm install --frozen-lockfile
+    script:
+        - pnpm run lint
+    rules:
+        - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
