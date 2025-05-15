@@ -4,8 +4,12 @@
         "module": "CommonJS",
         "outDir": "dist",
         "esModuleInterop": true,
-        "strict": true
+        "baseUrl": "../../..",
+        "paths": {
+            "lib/*": ["lib/*"],
+            "types/*": ["types/*"]
+        }
     },
-    "include": ["index.ts"],
+    "include": ["src/**/*.ts", "../../../lib/**/*.ts", "../../../types/**/*.ts"],
     "exclude": ["node_modules", "dist"]
 }

@@ -1,8 +1,8 @@
 import { HttpFunction } from '@google-cloud/functions-framework';
 
-import { config } from '../../../lib/config';
-import { logger } from '../../../lib/logger';
-import { errorHandler } from '../../../lib/middleware';
+import { config } from '../../../../lib/config';
+import { logger } from '../../../../lib/logger';
+import { errorHandler } from '../../../../lib/middleware';
 import { setupApp } from './app';
 import { fraudAnalysisRouter } from './routes/index';
 

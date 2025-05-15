@@ -4,10 +4,10 @@ deploy_fraud_analysis:
     environment:
         name: $CI_COMMIT_BRANCH/fraud-analysis
     script:
-        - echo "🚀 Deploying fraud-analysis to $GCP_PROJECT_ID in $GCP_REGION"
-
-        # Set environment-specific secrets manually
         - |
+            echo "🚀 Deploying fraud-analysis to $GCP_PROJECT_ID in $GCP_REGION"
+
+            # Set environment-specific vars
             if [[ "$CI_COMMIT_BRANCH" == "staging" ]]; then
               export API_KEY=$API_KEY_STAGING
               export NODE_ENV=staging
@@ -19,17 +19,22 @@ deploy_fraud_analysis:
               exit 1
             fi
 
-        - |
+            # Build the function with pnpm
+            pnpm --filter fraud-analysis run build
+
+            # Deploy from the dist directory
             gcloud functions deploy fraudAnalysis \
               --gen2 \
               --entry-point=defaultHandler \
               --runtime=nodejs20 \
               --trigger-http \
-              --source=apps/functions/fraud-analysis \
+              --source=apps/functions/fraud-analysis/dist \
               --allow-unauthenticated \
-              --set-env-vars "API_KEY=$API_KEY,NODE_ENV=$NODE_ENV"
+              --set-env-vars "API_KEY=$API_KEY,NODE_ENV=$NODE_ENV,GOOGLE_NODE_RUN_SCRIPTS="
     rules:
         - if: '$CI_COMMIT_BRANCH == "staging" || $CI_COMMIT_BRANCH == "production"'
           changes:
               - apps/functions/fraud-analysis/**
-              - .gitlab/ci/functions.fraud-analysis.yml
+              - lib/**
+              - types/**
+              - .gitlab/ci/fraud-analysis.yml

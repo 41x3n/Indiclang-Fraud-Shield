@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
-import { throwFormattedError } from '../../../../lib/error';
-import { logger } from '../../../../lib/logger';
-import { log_ctx } from '../../../../types';
+import { throwFormattedError } from '../../../../../lib/error';
+import { logger } from '../../../../../lib/logger';
+import { log_ctx } from '../../../../../types';
 import { FraudAnalysisRequest } from '../dtos';
 import FraudAnalysisService from '../services';
 

@@ -1,12 +1,8 @@
 import express from 'express';
 import { Express } from 'express';
 
-import { requestLogger, responseFormatter, verifyApiKey } from '../../../lib/middleware';
+import { requestLogger, responseFormatter, verifyApiKey } from '../../../../lib/middleware';
 
-/**
- * Sets up the Express application with common middleware and basic routes
- * @returns Configured Express application
- */
 export function setupApp(): Express {
     const app = express();
 

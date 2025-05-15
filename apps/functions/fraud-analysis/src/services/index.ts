@@ -1,6 +1,6 @@
-import { logger } from '../../../../lib/logger';
-import { ErrorCode, log_ctx } from '../../../../types';
-import { FraudAnalysisRequest } from '../dtos';
+import { logger } from '../../../../../lib/logger';
+import { ErrorCode, log_ctx } from '../../../../../types';
+import { FraudAnalysisRequest } from '../../src/dtos';
 
 class FraudAnalysisService {
     async analyzeMessage({ body, ctx }: { body: FraudAnalysisRequest; ctx: log_ctx }): Promise<{
@@ -14,7 +14,7 @@ class FraudAnalysisService {
         });
         try {
             return {
-                data: { message: 'Fraud analysis result' },
+                data: { message: 'Fraud analysis result in progress' },
                 errorMessage: null,
                 errorCode: null,
             };

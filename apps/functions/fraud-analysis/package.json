@@ -2,9 +2,10 @@
     "name": "fraud-analysis",
     "version": "1.0.0",
     "description": "",
-    "main": "dist/index.js",
+    "main": "index.js",
     "scripts": {
-        "build": "tsc",
+        "gcp-build": "",
+        "build": "esbuild src/index.ts --bundle --platform=node --target=node20 --format=cjs --outfile=dist/index.js && cp package.json dist/",
         "dev": "functions-framework --target=defaultHandler --port=8083 --source=dist"
     },
     "keywords": [],
@@ -12,11 +13,14 @@
     "license": "ISC",
     "packageManager": "pnpm@10.10.0",
     "dependencies": {
-        "express": "^5.1.0"
+        "express": "^5.1.0",
+        "http-status-codes": "^2.3.0",
+        "zod": "^3.24.4"
     },
     "devDependencies": {
         "@google-cloud/functions-framework": "^4.0.0",
         "@types/express": "^5.0.1",
+        "esbuild": "^0.25.4",
         "typescript": "^5.8.3"
     }
 }

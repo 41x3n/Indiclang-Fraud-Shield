@@ -1,6 +1,6 @@
 import { Router } from 'express';
 
-import { validate } from '../../../../lib/middleware';
+import { validate } from '../../../../../lib/middleware';
 import FraudAnalysisController from '../controllers';
 import { FraudAnalysisRequestSchema } from '../dtos';
 import FraudAnalysisService from '../services';

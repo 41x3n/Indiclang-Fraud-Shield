@@ -5,7 +5,7 @@
     "main": "index.js",
     "scripts": {
         "build": "pnpm -r run build",
-        "dev": "concurrently \"pnpm --filter hello-1 run dev\" \"pnpm --filter hello-2 run dev\" \"pnpm --filter hello-3 run dev\"",
+        "dev": "concurrently \"pnpm --filter hello-1 run dev\" \"pnpm --filter hello-2 run dev\" \"pnpm --filter fraud-analysis run dev\"",
         "start": "nodemon --watch . --ext ts --exec \"ts-node dev.ts\"",
         "format": "prettier --write .",
         "lint": "eslint . --ext .ts",
