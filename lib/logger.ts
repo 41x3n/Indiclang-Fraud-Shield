@@ -1,14 +1,64 @@
 import winston from 'winston';
 
-const logger = winston.createLogger({
-    level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
-    format: winston.format.combine(winston.format.timestamp(), winston.format.json()),
-    defaultMeta: { service: 'fraud-shield' },
-    transports: [
-        new winston.transports.Console({
-            format: winston.format.combine(winston.format.colorize(), winston.format.simple()),
-        }),
-    ],
+const customFormat = winston.format.printf(({ level, message, timestamp, ...metadata }) => {
+    const extraData = { ...metadata };
+    delete extraData.service;
+
+    // Check if there are additional metadata fields
+    const hasExtraData = Object.keys(extraData).length > 0;
+
+    return JSON.stringify({
+        timestamp,
+        level,
+        message,
+        ...(hasExtraData ? { data: extraData } : {}),
+        service: metadata.service,
+    });
 });
 
-export { logger };
+const logger = winston.createLogger({
+    level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
+    format: winston.format.combine(winston.format.timestamp(), winston.format.json(), customFormat),
+    defaultMeta: { service: 'fraud-shield', environment: process.env.NODE_ENV },
+    transports: [new winston.transports.Console()],
+});
+
+const enhancedLogger = {
+    log: (message: string, data?: any) => {
+        if (data) {
+            logger.info(message, data);
+        } else {
+            logger.info(message);
+        }
+    },
+    info: (message: string, data?: any) => {
+        if (data) {
+            logger.info(message, data);
+        } else {
+            logger.info(message);
+        }
+    },
+    debug: (message: string, data?: any) => {
+        if (data) {
+            logger.debug(message, data);
+        } else {
+            logger.debug(message);
+        }
+    },
+    error: (message: string, data?: any) => {
+        if (data) {
+            logger.error(message, data);
+        } else {
+            logger.error(message);
+        }
+    },
+    warn: (message: string, data?: any) => {
+        if (data) {
+            logger.warn(message, data);
+        } else {
+            logger.warn(message);
+        }
+    },
+};
+
+export { enhancedLogger as logger };
