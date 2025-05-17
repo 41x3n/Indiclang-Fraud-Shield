@@ -1,13 +1,13 @@
 import { HttpFunction } from '@google-cloud/functions-framework';
 
-import { config } from '../../../../lib/config';
+import { Config } from '../../../../lib/config';
 import { logger } from '../../../../lib/logger';
 import { errorHandler } from '../../../../lib/middleware';
 import { setupApp } from './app';
 import { fraudAnalysisRouter } from './routes/index';
 
 // Initialize logging
-if (config.isProd) {
+if (Config.isProd) {
     logger.info('Running in production mode');
 }
 

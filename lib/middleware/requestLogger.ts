@@ -27,14 +27,18 @@ export function requestLogger(req: Request, res: Response, next: NextFunction) {
     }
 
     // Pre-request log
+    const logMetadata: Record<string, any> = {
+        requestId,
+        ip: req.ip,
+        headers: sanitizeHeaders(req.headers),
+        query: req.query,
+    };
+    if (req.body && Object.keys(req.body).length > 0) {
+        logMetadata.body = req.body;
+    }
     logger.info(`→ ${req.method} ${req.originalUrl}`, {
         label: 'Request',
-        metadata: {
-            requestId,
-            ip: req.ip,
-            headers: sanitizeHeaders(req.headers),
-            query: req.query,
-        },
+        metadata: logMetadata,
     });
 
     // Post-request log

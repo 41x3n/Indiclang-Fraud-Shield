@@ -17,17 +17,22 @@ class FraudAnalysisService {
         errorMessage: string | null;
         errorCode: ErrorCode | null;
     }> {
-        logger.info('FraudAnalysisService.analyzeMessage', {
-            body,
-            ...ctx,
-        });
+        logger.info('FraudAnalysisService.analyzeMessage', ctx);
         try {
             const { message, userTags } = body;
-            const heuristicResult = this.heuristicService.runHeuristics(message, {
-                userTags,
+            const heuristicResult = this.heuristicService.runHeuristics({
+                message,
+                options: { userTags },
+                ctx,
             });
+
+            ctx.heuristicResult = heuristicResult;
+
+            logger.info('FraudAnalysisService.analyzeMessage - Heuristic result', ctx);
+
+            const languageResult = await this.llmService.detectLanguage({ message, ctx });
             return {
-                data: { heuristicResult },
+                data: { heuristicResult, languageResult },
                 errorMessage: null,
                 errorCode: null,
             };

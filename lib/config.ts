@@ -6,7 +6,7 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 // Define all required env vars here
-const REQUIRED_VARS = ['API_KEY', 'NODE_ENV'] as const;
+const REQUIRED_VARS = ['API_KEY', 'NODE_ENV', 'CLOUD_PROJECT_NAME'] as const;
 
 type RequiredEnv = {
     [K in (typeof REQUIRED_VARS)[number]]: string;
@@ -30,8 +30,9 @@ if (missing.length > 0) {
 }
 
 // Export clean, typed config
-export const config = {
+export const Config = {
     apiKey: loadedEnv.API_KEY,
     nodeEnv: loadedEnv.NODE_ENV,
+    cloudProjectName: process.env.CLOUD_PROJECT_NAME,
     isProd: loadedEnv.NODE_ENV === 'production',
 };

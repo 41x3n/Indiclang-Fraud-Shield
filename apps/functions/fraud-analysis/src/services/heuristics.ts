@@ -1,10 +1,19 @@
 import { heuristicRules, MAX_BOOST, userTagMap } from '../../../../../lib/llm/heuristicsRules';
-import { HeuristicKey, HeuristicOutput, HeuristicsOptions } from '../../../../../types';
+import { logger } from '../../../../../lib/logger';
+import { HeuristicKey, HeuristicOutput, HeuristicsOptions, log_ctx } from '../../../../../types';
 
 export class HeuristicService {
     constructor() {}
 
-    runHeuristics(message: string, options: HeuristicsOptions = {}): HeuristicOutput {
+    runHeuristics({
+        message,
+        options,
+        ctx,
+    }: {
+        message: string;
+        options: HeuristicsOptions;
+        ctx: log_ctx;
+    }): HeuristicOutput {
         let scoreBoost = 0;
         const heuristicReasons: HeuristicKey[] = [];
 
@@ -26,6 +35,8 @@ export class HeuristicService {
         });
 
         scoreBoost = Math.min(scoreBoost, MAX_BOOST);
+
+        logger.info('HeuristicService.runHeuristics', ctx);
 
         return {
             scoreBoost: parseFloat(scoreBoost.toFixed(2)),

@@ -30,7 +30,7 @@ deploy_fraud_analysis:
               --trigger-http \
               --source=apps/functions/fraud-analysis/dist \
               --allow-unauthenticated \
-              --set-env-vars "API_KEY=$API_KEY,NODE_ENV=$NODE_ENV,GOOGLE_NODE_RUN_SCRIPTS="
+              --set-env-vars "API_KEY=$API_KEY,NODE_ENV=$NODE_ENV,GOOGLE_NODE_RUN_SCRIPTS=,CLOUD_PROJECT_NAME=$GCP_PROJECT_ID" \
     rules:
         - if: '$CI_COMMIT_BRANCH == "staging" || $CI_COMMIT_BRANCH == "production"'
           changes:

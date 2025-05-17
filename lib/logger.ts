@@ -1,5 +1,7 @@
 import winston from 'winston';
 
+import { Config } from './config';
+
 const customFormat = winston.format.printf(({ level, message, timestamp, ...metadata }) => {
     const extraData = { ...metadata };
     delete extraData.service;
@@ -17,9 +19,9 @@ const customFormat = winston.format.printf(({ level, message, timestamp, ...meta
 });
 
 const logger = winston.createLogger({
-    level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
+    level: Config.nodeEnv === 'production' ? 'info' : 'debug',
     format: winston.format.combine(winston.format.timestamp(), winston.format.json(), customFormat),
-    defaultMeta: { service: 'fraud-shield', environment: process.env.NODE_ENV },
+    defaultMeta: { service: 'fraud-shield', environment: Config.nodeEnv },
     transports: [new winston.transports.Console()],
 });
 

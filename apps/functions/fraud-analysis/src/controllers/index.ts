@@ -16,12 +16,11 @@ class FraudAnalysisController {
 
     async analyzeMessage(req: Request, res: Response) {
         const body: FraudAnalysisRequest = req.body;
+        const requestId = req.headers['x-request-id'] as string;
         const ctx: log_ctx = {
-            body: body,
+            requestId,
         };
-        logger.info('FraudAnalysisController.analyzeMessage - Analyzing message', {
-            ...ctx,
-        });
+        logger.info('FraudAnalysisController.analyzeMessage - Analyzing message', ctx);
 
         const { data, errorMessage, errorCode } = await this.fraudAnalysisService.analyzeMessage({
             body,
