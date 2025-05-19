@@ -11,7 +11,7 @@ export class LanguageDetectorAgent {
     private readonly PROMPT_TEMPLATE: string;
 
     constructor() {
-        this.MODEL_ID = 'gemini-2.5-flash-preview-04-17';
+        this.MODEL_ID = 'gemini-2.0-flash-lite-001';
         this.AI_INSTANCE = new GoogleGenAI({
             vertexai: true,
             project: Config.cloudProjectName,

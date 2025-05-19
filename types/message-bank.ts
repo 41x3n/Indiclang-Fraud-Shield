@@ -13,6 +13,14 @@ export enum Language {
 }
 
 export enum MessageType {
-    SPAM = 'spam',
-    NON_SPAM = 'non_spam',
+    SCAM = 'scam',
+    NON_SCAM = 'non_scam',
+    MAYBE_SCAM = 'maybe_scam',
+}
+
+export interface ExampleMessage {
+    language: Language;
+    script: Language;
+    message: string;
+    label: MessageType;
 }
