@@ -92,38 +92,6 @@ importers:
         specifier: ^5.8.3
         version: 5.8.3
 
-  apps/functions/hello-1:
-    dependencies:
-      express:
-        specifier: ^5.1.0
-        version: 5.1.0
-    devDependencies:
-      '@google-cloud/functions-framework':
-        specifier: ^4.0.0
-        version: 4.0.0
-      '@types/express':
-        specifier: ^5.0.1
-        version: 5.0.1
-      typescript:
-        specifier: ^5.8.3
-        version: 5.8.3
-
-  apps/functions/hello-2:
-    dependencies:
-      express:
-        specifier: ^5.1.0
-        version: 5.1.0
-    devDependencies:
-      '@google-cloud/functions-framework':
-        specifier: ^4.0.0
-        version: 4.0.0
-      '@types/express':
-        specifier: ^5.0.1
-        version: 5.0.1
-      typescript:
-        specifier: ^5.8.3
-        version: 5.8.3
-
 packages:
 
   '@babel/code-frame@7.27.1':

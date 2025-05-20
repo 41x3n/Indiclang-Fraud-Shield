@@ -7,7 +7,6 @@ export function responseFormatter(req: Request, res: Response, next: NextFunctio
     const oldJson = res.json;
 
     res.json = function (payload: any) {
-        // Don't rewrap if payload already has `statusCode` + `error` and no `data`
         const looksFormattedError =
             payload &&
             typeof payload === 'object' &&
@@ -16,7 +15,7 @@ export function responseFormatter(req: Request, res: Response, next: NextFunctio
             payload.data === null;
 
         if (looksFormattedError) {
-            return oldJson.call(this, payload); // Let it pass untouched
+            return oldJson.call(this, payload);
         }
 
         const statusCode = res.statusCode;

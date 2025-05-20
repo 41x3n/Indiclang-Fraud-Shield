@@ -6,7 +6,7 @@
     "scripts": {
         "gcp-build": "",
         "build": "esbuild src/index.ts --bundle --platform=node --target=node20 --format=cjs --outfile=dist/index.js && cp package.json dist/",
-        "dev": "functions-framework --target=defaultHandler --port=8083 --source=dist"
+        "dev": "functions-framework --target=defaultHandler --port=8081 --source=dist"
     },
     "keywords": [],
     "author": "",

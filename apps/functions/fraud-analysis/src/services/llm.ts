@@ -1,5 +1,6 @@
+import { ExampleMessage, Language, LanguageDetectionResult } from '../../../../../lib/llm/types';
 import { logger } from '../../../../../lib/logger';
-import { ExampleMessage, Language, LanguageDetectionResult, log_ctx } from '../../../../../types';
+import { log_ctx } from '../../../../../types/index';
 import { LanguageDetectorAgent } from '../agents';
 import { ScamClassifierAgent } from '../agents/scamClassifierAgent';
 
@@ -7,9 +8,12 @@ export class LLMService {
     private languageDetectorAgent: LanguageDetectorAgent;
     private scamClassifierAgent: ScamClassifierAgent;
 
-    constructor() {
-        this.languageDetectorAgent = new LanguageDetectorAgent();
-        this.scamClassifierAgent = new ScamClassifierAgent();
+    constructor(
+        languageDetectorAgent?: LanguageDetectorAgent,
+        scamClassifierAgent?: ScamClassifierAgent,
+    ) {
+        this.languageDetectorAgent = languageDetectorAgent || new LanguageDetectorAgent();
+        this.scamClassifierAgent = scamClassifierAgent || new ScamClassifierAgent();
     }
 
     async detectLanguage({ message, ctx }: { message: string; ctx: log_ctx }): Promise<any> {

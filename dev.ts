@@ -19,6 +19,4 @@ const runFunction = async (name: string, port: number, src = false) => {
     });
 };
 
-runFunction('hello-1', 8081);
-runFunction('hello-2', 8082);
-runFunction('fraud-analysis', 8083, true);
+runFunction('fraud-analysis', 8081, true);

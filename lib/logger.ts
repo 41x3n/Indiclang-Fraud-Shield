@@ -6,7 +6,6 @@ const customFormat = winston.format.printf(({ level, message, timestamp, ...meta
     const extraData = { ...metadata };
     delete extraData.service;
 
-    // Check if there are additional metadata fields
     const hasExtraData = Object.keys(extraData).length > 0;
 
     return JSON.stringify({

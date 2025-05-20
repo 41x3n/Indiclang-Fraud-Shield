@@ -5,7 +5,6 @@ if (process.env.NODE_ENV !== 'production') {
     console.log('[env] Loaded from .env');
 }
 
-// Define all required env vars here
 const REQUIRED_VARS = ['API_KEY', 'NODE_ENV', 'CLOUD_PROJECT_NAME'] as const;
 
 type RequiredEnv = {
@@ -29,7 +28,6 @@ if (missing.length > 0) {
     throw new Error(`[env] Missing required env vars: ${missing.join(', ')}`);
 }
 
-// Export clean, typed config
 export const Config = {
     apiKey: loadedEnv.API_KEY,
     nodeEnv: loadedEnv.NODE_ENV,

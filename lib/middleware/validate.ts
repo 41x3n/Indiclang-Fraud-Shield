@@ -26,7 +26,6 @@ export function validate(schema: ZodSchema<any>) {
             );
         }
 
-        // Attach parsed data to request (optional)
         (req as any).validated = result.data;
 
         next();

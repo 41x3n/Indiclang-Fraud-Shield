@@ -4,7 +4,5 @@ stages:
 
 include:
     - local: '.gitlab/ci/deploy-common.yml'
-    - local: '.gitlab/ci/functions.hello-1.yml'
-    - local: '.gitlab/ci/functions.hello-2.yml'
     - local: '.gitlab/ci/fraud-analysis.yml'
     - local: '.gitlab/ci/code-check.yml'

@@ -1,4 +1,4 @@
-import { HeuristicKey, HeuristicRule, HeuristicRuleBase } from '../../types';
+import { HeuristicKey, HeuristicRule, HeuristicRuleBase } from '../../types/heuristic';
 
 export const baseHeuristicMap: Record<HeuristicKey, Partial<HeuristicRuleBase>> = {
     [HeuristicKey.MONEY]: { boost: 0.1, reason: 'May involve money', type: 'rule' },
@@ -106,7 +106,6 @@ export const userTagMap: Record<HeuristicKey, HeuristicRuleBase> = Object.entrie
     .filter(([_, val]) => val.type === 'tag')
     .reduce(
         (acc, [key, val]) => {
-            // Ensure all required properties are present and not undefined
             const { boost, reason, type } = val;
             if (boost === undefined || reason === undefined || type === undefined) {
                 throw new Error(`Incomplete heuristic rule base for tag key: ${key}`);

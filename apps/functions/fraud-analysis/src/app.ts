@@ -6,18 +6,15 @@ import { requestLogger, responseFormatter, verifyApiKey } from '../../../../lib/
 export function setupApp(): Express {
     const app = express();
 
-    // Add common middleware
     app.use(requestLogger);
     app.use(express.json());
     app.use(responseFormatter);
 
-    // Skip auth for health checks
     app.use((req, res, next) => {
         if (req.path === '/health') return next();
         verifyApiKey(req, res, next);
     });
 
-    // Add health check endpoint
     app.get('/health', (req, res) => {
         res.status(200).send('OK');
     });

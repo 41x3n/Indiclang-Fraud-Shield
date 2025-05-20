@@ -10,9 +10,9 @@ import {
     Telugu,
     Urdu,
 } from '../../../../../lib/llm/message-bank';
+import { Language } from '../../../../../lib/llm/types';
 import { logger } from '../../../../../lib/logger';
 import { ErrorCode, log_ctx } from '../../../../../types';
-import { Language } from '../../../../../types/message-bank';
 import { FraudAnalysisRequest } from '../../src/dtos';
 import { HeuristicService } from './heuristics';
 import { LLMService } from './llm';
@@ -21,9 +21,9 @@ class FraudAnalysisService {
     private heuristicService: HeuristicService;
     private llmService: LLMService;
 
-    constructor() {
-        this.heuristicService = new HeuristicService();
-        this.llmService = new LLMService();
+    constructor(heuristicService?: HeuristicService, llmService?: LLMService) {
+        this.heuristicService = heuristicService || new HeuristicService();
+        this.llmService = llmService || new LLMService();
     }
     async analyzeMessage({ body, ctx }: { body: FraudAnalysisRequest; ctx: log_ctx }): Promise<{
         data: Record<string, any> | null;

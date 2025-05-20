@@ -1,4 +1,4 @@
-import { ExampleMessage, Language, MessageType } from '../../types/message-bank';
+import { ExampleMessage, Language, MessageType } from './types';
 
 export const scamHindiNative: ExampleMessage[] = [
     {
@@ -134,7 +134,7 @@ export const scamHindiLatin: ExampleMessage[] = [
         language: Language.Hindi,
         script: Language.Latin,
         label: MessageType.SCAM,
-        message: 'PAN card inactive hai. Documents panfix.in/upload par upload karein.',
+        message: 'PAN card inactive hai. Documents panfix.in/upload karein.',
     },
     {
         language: Language.Hindi,
@@ -698,13 +698,13 @@ export const scamGujaratiLatin: ExampleMessage[] = [
         script: Language.Latin,
         label: MessageType.SCAM,
         message:
-            'DigiLocker documents private mode ma che. Kholva bit.ly/dl-unlock par payment karo.',
+            'DigiLocker documents private mode ma che. Khulte bit.ly/dl-unlock par payment karo.',
     },
     {
         language: Language.Gujarati,
         script: Language.Latin,
         label: MessageType.SCAM,
-        message: 'Mobile SIM re-verification jaruri che. VERIFY lihkhi 9200321321 par SMS karo.',
+        message: 'Mobile SIM re-verification dorkar. VERIFY likhe 9200321321 par SMS karo.',
     },
     {
         language: Language.Gujarati,
@@ -728,7 +728,8 @@ export const scamGujaratiLatin: ExampleMessage[] = [
         language: Language.Gujarati,
         script: Language.Latin,
         label: MessageType.SCAM,
-        message: 'WFH job: darroj ₹3,000 kamao. jobsapply.in par ₹299 registration fee jama karo.',
+        message:
+            'Work-from-home job: roj ₹3,000 income. jobsapply.in par ₹299 registration fee jama din.',
     },
 ];
 
@@ -810,7 +811,7 @@ export const scamKannadaNative: ExampleMessage[] = [
         script: Language.Kannada,
         label: MessageType.SCAM,
         message:
-            'ನಿಮ್ಮ ಬ್ಯಾಂಕ್ KYC 24 ಗಂಟೆಗಳಲ್ಲಿ ಕೊನೆಗೊಳ್ಳುತ್ತದೆ. bit.ly/kyc-kn ಅಪ್‌ಡೇಟ್ ಮಾಡದರೆ ಖಾತೆ முடಗೆ.',
+            'ನಿಮ್ಮ ಬ್ಯಾಂಕ್ KYC 24 ಗಂಟೆಗಳಲ್ಲಿ ಕೊನೆಗೊಳ್ಳುತ್ತದೆ. bit.ly/kyc-kn ಅಪ್‌ಡೇಟ್ ಮಾಡದರೆ ಖಾತೆ ಮುಡಗೆ.',
     },
     {
         language: Language.Kannada,
@@ -1101,7 +1102,7 @@ export const scamMalayalamNative: ExampleMessage[] = [
         script: Language.Malayalam,
         label: MessageType.SCAM,
         message:
-            'വిద്യुत്ബില്‍ കുടിശ്ശിക ₹1,230. രാത്രി 8ന് മുമ്പ് bijlibill.in അടയ്ക്കൂ, അല്ലെങ്കില്‍ വൈദ്യുതി നീക്കം.',
+            'വിദ്യുത്ബില്‍ കുടിശ്ശിക ₹1,230. രാത്രി 8ന് മുമ്പ് bijlibill.in അടയ്ക്കൂ, അല്ലെങ്കില്‍ വൈദ്യുതി നീക്കം.',
     },
     {
         language: Language.Malayalam,
@@ -1201,7 +1202,7 @@ export const scamMalayalamLatin: ExampleMessage[] = [
         language: Language.Malayalam,
         script: Language.Latin,
         label: MessageType.SCAM,
-        message: 'FASTag blacklist aakum. wallet@upi leku ₹100 recharge cheyyuka.',
+        message: 'FASTag blacklist avutondi. wallet@upi ki ₹100 recharge cheyyuka.',
     },
     {
         language: Language.Malayalam,
@@ -1225,13 +1226,13 @@ export const scamMalayalamLatin: ExampleMessage[] = [
         language: Language.Malayalam,
         script: Language.Latin,
         label: MessageType.SCAM,
-        message: 'Credit-card limit ₹2,00,000 vare koottan otpcard.in OTP share cheyyuka.',
+        message: 'Credit-card limit ₹2,00,000 varaku peragadaniki otpcard.in OTP share cheyandi.',
     },
     {
         language: Language.Malayalam,
         script: Language.Latin,
         label: MessageType.SCAM,
-        message: 'Income-tax refund ₹18,540 nedan bankdetails.in details fill cheyyuka.',
+        message: 'Income-tax refund ₹18,540 kosam bankdetails.in lo details fill cheyandi.',
     },
     {
         language: Language.Malayalam,

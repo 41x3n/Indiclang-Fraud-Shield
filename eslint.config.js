@@ -34,7 +34,6 @@ module.exports = [
                 },
             ],
 
-            // Add these rules to enable simple-import-sort
             'simple-import-sort/imports': 'error',
             'simple-import-sort/exports': 'error',
         },

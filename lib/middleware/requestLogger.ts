@@ -18,15 +18,13 @@ function sanitizeHeaders(headers: Record<string, unknown>) {
 export function requestLogger(req: Request, res: Response, next: NextFunction) {
     const start = Date.now();
 
-    // Ensure request ID exists
     let requestId = req.headers['x-request-id'] as string;
     if (!requestId) {
         requestId = uuidv4();
         req.headers['x-request-id'] = requestId;
-        res.setHeader('x-request-id', requestId); // also return it
+        res.setHeader('x-request-id', requestId);
     }
 
-    // Pre-request log
     const logMetadata: Record<string, any> = {
         requestId,
         ip: req.ip,
@@ -41,7 +39,6 @@ export function requestLogger(req: Request, res: Response, next: NextFunction) {
         metadata: logMetadata,
     });
 
-    // Post-request log
     res.on('finish', () => {
         const duration = Date.now() - start;
 
