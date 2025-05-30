@@ -1,4 +1,4 @@
-deploy_fraud_analysis:
+deploy_whatsapp_callback:
     extends: .deploy_function_template
     stage: deploy
     environment:
