@@ -5,7 +5,17 @@ if (process.env.NODE_ENV !== 'production') {
     console.log('[env] Loaded from .env');
 }
 
-const REQUIRED_VARS = ['API_KEY', 'NODE_ENV', 'CLOUD_PROJECT_NAME'] as const;
+const REQUIRED_VARS = [
+    'API_KEY',
+    'NODE_ENV',
+    'CLOUD_PROJECT_NAME',
+    'TWILIO_ACCOUNT_SID',
+    'TWILIO_AUTH_TOKEN',
+    'TWILIO_PREFERRED_LANGUAGE_TEMPLATE_ID',
+    'TWILIO_WHATSAPP_FROM',
+    'TWILIO_MESSAGE_SCANNING_REQUEST_TEMPLATE_ID',
+    'FRAUD_ANALYSIS_API_URL',
+] as const;
 
 type RequiredEnv = {
     [K in (typeof REQUIRED_VARS)[number]]: string;
@@ -33,4 +43,11 @@ export const Config = {
     nodeEnv: loadedEnv.NODE_ENV,
     cloudProjectName: process.env.CLOUD_PROJECT_NAME,
     isProd: loadedEnv.NODE_ENV === 'production',
+    twilioAccountSid: process.env.TWILIO_ACCOUNT_SID,
+    twilioAuthToken: process.env.TWILIO_AUTH_TOKEN,
+    twilioPreferredLanguageTemplateId: process.env.TWILIO_PREFERRED_LANGUAGE_TEMPLATE_ID as string,
+    twilioWhatsAppFrom: process.env.TWILIO_WHATSAPP_FROM as string,
+    twilioMessageScanningRequestTemplateId: process.env
+        .TWILIO_MESSAGE_SCANNING_REQUEST_TEMPLATE_ID as string,
+    fraudAnalysisApiUrl: process.env.FRAUD_ANALYSIS_API_URL as string,
 };

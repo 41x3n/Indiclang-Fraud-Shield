@@ -1,0 +1,42 @@
+deploy_fraud_analysis:
+    extends: .deploy_function_template
+    stage: deploy
+    environment:
+        name: $CI_COMMIT_BRANCH/whatsapp-callback
+    script:
+        - |
+            echo "🚀 Deploying whatsapp-callback to $GCP_PROJECT_ID in $GCP_REGION"
+
+            # Set environment-specific vars
+            if [[ "$CI_COMMIT_BRANCH" == "staging" ]]; then
+              export API_KEY=$API_KEY_STAGING
+              export NODE_ENV=staging
+              export FRAUD_ANALYSIS_API_URL=$FRAUD_ANALYSIS_API_URL_STAGING
+            elif [[ "$CI_COMMIT_BRANCH" == "production" ]]; then
+              export API_KEY=$API_KEY_PROD
+              export NODE_ENV=production
+              export FRAUD_ANALYSIS_API_URL=$FRAUD_ANALYSIS_API_URL_PROD
+            else
+              echo "❌ Unknown branch: $CI_COMMIT_BRANCH"
+              exit 1
+            fi
+
+            # Build the function with pnpm
+            pnpm --filter whatsapp-callback run build
+
+            # Deploy from the dist directory
+            gcloud functions deploy whatsappCallback \
+              --gen2 \
+              --entry-point=defaultHandler \
+              --runtime=nodejs20 \
+              --trigger-http \
+              --source=apps/functions/whatsapp-callback/dist \
+              --allow-unauthenticated \
+              --set-env-vars "API_KEY=$API_KEY,NODE_ENV=$NODE_ENV,GOOGLE_NODE_RUN_SCRIPTS=,CLOUD_PROJECT_NAME=$GCP_PROJECT_ID,TWILIO_ACCOUNT_SID=$TWILIO_ACCOUNT_SID,TWILIO_AUTH_TOKEN=$TWILIO_AUTH_TOKEN,TWILIO_PREFERRED_LANGUAGE_TEMPLATE_ID=$TWILIO_PREFERRED_LANGUAGE_TEMPLATE_ID,TWILIO_WHATSAPP_FROM=$TWILIO_WHATSAPP_FROM,TWILIO_MESSAGE_SCANNING_REQUEST_TEMPLATE_ID=$TWILIO_MESSAGE_SCANNING_REQUEST_TEMPLATE_ID,FRAUD_ANALYSIS_API_URL=$FRAUD_ANALYSIS_API_URL" \
+    rules:
+        - if: '$CI_COMMIT_BRANCH == "staging" || $CI_COMMIT_BRANCH == "production"'
+          changes:
+              - apps/functions/whatsapp-callback/**
+              - lib/**
+              - types/**
+              - .gitlab/ci/whatsapp-callback.yml

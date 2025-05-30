@@ -37,8 +37,8 @@ ${examples_block}
 {
   "risk_score": number,         // 0.00 – 1.00  (LLM score only)
   "risk_label": "scam" | "maybe_scam" | "not_scam",
-  "reason": "string",           // ≤ 25 words, in English
-  "suggestion": "string"        // ≤ 20 words, in English
+  "reason": "string",           // ≤ 50 words, in English. Be specific: explain the main risk factors or why the message is (not) a scam, referencing message content or heuristics. Avoid generic statements.
+  "suggestion": "string"        // ≤ 50 words, in English. Give a concrete, actionable next step for the user, tailored to the message context.
   "confidence": number          // 0.00 – 1.00
 }
 
@@ -50,7 +50,7 @@ ${examples_block}
        • ≥ 0.80 ⇒ scam  
        • 0.40–0.79 ⇒ maybe_scam  
        • < 0.40 ⇒ not_scam.
-2. Keep *reason* and *suggestion* in English.
+2. Keep *reason* and *suggestion* in English. Make them detailed, specific, and actionable. Avoid generic or vague responses.
 3. Output exactly and only the JSON object—no extra keys, comments, or new-lines.
 4. Do NOT mention heuristics or chain-of-thought.
 `;

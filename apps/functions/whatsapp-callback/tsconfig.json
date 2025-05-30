@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+        "target": "ES2020",
+        "module": "CommonJS",
+        "outDir": "dist",
+        "esModuleInterop": true,
+        "baseUrl": "../../..",
+        "paths": {
+            "lib/*": ["lib/*"],
+            "types/*": ["types/*"]
+        }
+    },
+    "include": ["src/**/*.ts", "../../../lib/**/*.ts", "../../../types/**/*.ts"],
+    "exclude": ["node_modules", "dist"]
+}

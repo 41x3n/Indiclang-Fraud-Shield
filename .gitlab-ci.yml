@@ -5,4 +5,5 @@ stages:
 include:
     - local: '.gitlab/ci/deploy-common.yml'
     - local: '.gitlab/ci/fraud-analysis.yml'
+    - local: '.gitlab/ci/whatsapp-callback.yml'
     - local: '.gitlab/ci/code-check.yml'

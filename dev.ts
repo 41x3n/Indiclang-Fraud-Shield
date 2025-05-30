@@ -20,3 +20,4 @@ const runFunction = async (name: string, port: number, src = false) => {
 };
 
 runFunction('fraud-analysis', 8081, true);
+runFunction('whatsapp-callback', 8082, true);
