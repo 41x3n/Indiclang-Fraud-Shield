@@ -1,23 +1,32 @@
-import { ExampleMessage, Language, LanguageDetectionResult } from '../../../../../lib/llm/types';
+import {
+    ExampleMessage,
+    Language,
+    LanguageDetectionResult,
+    ScamClassificationResult,
+} from '../../../../../lib/llm/types';
 import { logger } from '../../../../../lib/logger';
 import { HeuristicKey, log_ctx } from '../../../../../types/index';
 import { LanguageDetectorAgent } from '../agents';
 import { GeminiExtractAgent } from '../agents/geminiExtractAgent';
 import { ScamClassifierAgent } from '../agents/scamClassifierAgent';
+import { TranslatorAgent } from '../agents/translatorAgent';
 
 export class LLMService {
     private languageDetectorAgent: LanguageDetectorAgent;
     private scamClassifierAgent: ScamClassifierAgent;
     private geminiExtractAgent: GeminiExtractAgent;
+    private translatorAgent: TranslatorAgent;
 
     constructor(
         languageDetectorAgent?: LanguageDetectorAgent,
         scamClassifierAgent?: ScamClassifierAgent,
         geminiExtractAgent?: GeminiExtractAgent,
+        translatorAgent?: TranslatorAgent,
     ) {
         this.languageDetectorAgent = languageDetectorAgent || new LanguageDetectorAgent();
         this.scamClassifierAgent = scamClassifierAgent || new ScamClassifierAgent();
         this.geminiExtractAgent = geminiExtractAgent || new GeminiExtractAgent();
+        this.translatorAgent = translatorAgent || new TranslatorAgent();
     }
 
     async detectLanguage({ message, ctx }: { message: string; ctx: log_ctx }): Promise<any> {
@@ -107,5 +116,32 @@ export class LLMService {
             });
             return { message: '', userTags: [] };
         }
+    }
+
+    async translate({
+        scamClassifierResult,
+        userLanguage,
+        ctx,
+    }: {
+        scamClassifierResult: ScamClassificationResult;
+        userLanguage: Language;
+        ctx: log_ctx;
+    }): Promise<ScamClassificationResult> {
+        if (userLanguage === Language.English) {
+            return scamClassifierResult;
+        }
+        const { reason, suggestion } = await this.translatorAgent.translate({
+            reason: scamClassifierResult.reason,
+            suggestion: scamClassifierResult.suggestion,
+            sourceLanguage: Language.English,
+            targetLanguage: userLanguage,
+            ctx,
+        });
+
+        return {
+            ...scamClassifierResult,
+            reason,
+            suggestion,
+        };
     }
 }

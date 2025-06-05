@@ -51,6 +51,11 @@ export class ImageMessageService {
             }
 
             logger.log(`Processing image for boarded user ${WaId}`, ctx);
+            await this.twilioService.sendMessageScanningRequestTemplate({
+                to: WaId,
+                ctx,
+                messageId: payload.MessageSid,
+            });
         } catch (error) {
             logger.error(`Error handling image message: ${error}`, ctx);
         }

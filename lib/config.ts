@@ -15,6 +15,7 @@ const REQUIRED_VARS = [
     'TWILIO_WHATSAPP_FROM',
     'TWILIO_MESSAGE_SCANNING_REQUEST_TEMPLATE_ID',
     'FRAUD_ANALYSIS_API_URL',
+    'FRAUD_SCREENSHOT_ANALYSIS_API_URL',
 ] as const;
 
 type RequiredEnv = {
@@ -50,4 +51,5 @@ export const Config = {
     twilioMessageScanningRequestTemplateId: process.env
         .TWILIO_MESSAGE_SCANNING_REQUEST_TEMPLATE_ID as string,
     fraudAnalysisApiUrl: process.env.FRAUD_ANALYSIS_API_URL as string,
+    fraudScreenshotAnalysisApiUrl: process.env.FRAUD_SCREENSHOT_ANALYSIS_API_URL as string,
 };

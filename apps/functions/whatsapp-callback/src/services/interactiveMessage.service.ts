@@ -101,11 +101,12 @@ export class InteractiveMessageService {
                 return;
             }
 
-            const { content, waid } = messageObjFromDB;
+            const { content, waid, imageUrl } = messageObjFromDB;
             ctx.content = content;
             ctx.waid = waid;
+            ctx.imageUrl = imageUrl;
 
-            if (!content || !waid) {
+            if (!waid) {
                 logger.error(`Invalid message object for messageId ${messageId}`, ctx);
                 return;
             }
@@ -121,20 +122,34 @@ export class InteractiveMessageService {
             ctx.preferredLanguage = preferredLanguage;
             logger.log(`Getting LLM response for messageId ${messageId} and WaId ${WaId}`, ctx);
 
-            const response = await axios.post(
-                Config.fraudAnalysisApiUrl as string,
-                {
-                    message: content,
-                    userTags: ['from_unknown'],
-                    userLanguage: preferredLanguage,
-                },
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'x-api-key': Config.apiKey,
-                    },
-                },
-            );
+            const response = imageUrl
+                ? await axios.post(
+                      Config.fraudScreenshotAnalysisApiUrl as string,
+                      {
+                          userLanguage: preferredLanguage,
+                          screenshotUrl: imageUrl,
+                      },
+                      {
+                          headers: {
+                              'Content-Type': 'application/json',
+                              'x-api-key': Config.apiKey,
+                          },
+                      },
+                  )
+                : await axios.post(
+                      Config.fraudAnalysisApiUrl as string,
+                      {
+                          message: content,
+                          userTags: ['from_unknown'],
+                          userLanguage: preferredLanguage,
+                      },
+                      {
+                          headers: {
+                              'Content-Type': 'application/json',
+                              'x-api-key': Config.apiKey,
+                          },
+                      },
+                  );
             if (response.status !== 200) {
                 logger.error(`LLM API responded with status ${response.status}`, ctx);
                 return;

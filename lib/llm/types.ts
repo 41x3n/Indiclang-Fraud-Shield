@@ -47,3 +47,8 @@ export interface ExtractedMessageAndTagsResult {
     success: boolean;
     error: string;
 }
+
+export interface TranslatedResult {
+    reason: string;
+    suggestion: string;
+}

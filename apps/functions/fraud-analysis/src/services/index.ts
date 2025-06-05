@@ -35,7 +35,7 @@ class FraudAnalysisService {
     }> {
         logger.info('FraudAnalysisService.analyzeMessage', ctx);
         try {
-            const { message, userTags } = body;
+            const { message, userTags, userLanguage } = body;
             const heuristicResult = this.heuristicService.runHeuristics({
                 message,
                 options: { userTags },
@@ -89,12 +89,19 @@ class FraudAnalysisService {
                 };
             }
 
+            const scamClassifierResultWithTranslation = await this.llmService.translate({
+                scamClassifierResult,
+                userLanguage,
+                ctx,
+            });
+            ctx.scamClassifierResultWithTranslation = scamClassifierResultWithTranslation;
+
             return {
                 data: {
                     heuristicResult,
                     languageDetectionResult,
                     useMessageBank,
-                    scamClassifierResult,
+                    scamClassifierResult: scamClassifierResultWithTranslation,
                 },
                 errorMessage: null,
                 errorCode: null,
