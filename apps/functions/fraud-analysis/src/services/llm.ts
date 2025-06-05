@@ -1,19 +1,23 @@
 import { ExampleMessage, Language, LanguageDetectionResult } from '../../../../../lib/llm/types';
 import { logger } from '../../../../../lib/logger';
-import { log_ctx } from '../../../../../types/index';
+import { HeuristicKey, log_ctx } from '../../../../../types/index';
 import { LanguageDetectorAgent } from '../agents';
+import { GeminiExtractAgent } from '../agents/geminiExtractAgent';
 import { ScamClassifierAgent } from '../agents/scamClassifierAgent';
 
 export class LLMService {
     private languageDetectorAgent: LanguageDetectorAgent;
     private scamClassifierAgent: ScamClassifierAgent;
+    private geminiExtractAgent: GeminiExtractAgent;
 
     constructor(
         languageDetectorAgent?: LanguageDetectorAgent,
         scamClassifierAgent?: ScamClassifierAgent,
+        geminiExtractAgent?: GeminiExtractAgent,
     ) {
         this.languageDetectorAgent = languageDetectorAgent || new LanguageDetectorAgent();
         this.scamClassifierAgent = scamClassifierAgent || new ScamClassifierAgent();
+        this.geminiExtractAgent = geminiExtractAgent || new GeminiExtractAgent();
     }
 
     async detectLanguage({ message, ctx }: { message: string; ctx: log_ctx }): Promise<any> {
@@ -85,6 +89,23 @@ export class LLMService {
                 error: (error as Error).message,
             });
             return null;
+        }
+    }
+
+    async extractMessageAndTags({
+        ocrText,
+        ctx,
+    }: {
+        ocrText: string;
+        ctx: log_ctx;
+    }): Promise<{ message: string; userTags: HeuristicKey[] }> {
+        try {
+            return await this.geminiExtractAgent.extractMessageAndTags({ ocrText, ctx });
+        } catch (error) {
+            logger.error('LLMService.extractMessageAndTags - Gemini extraction failed', {
+                error: (error as Error).message,
+            });
+            return { message: '', userTags: [] };
         }
     }
 }

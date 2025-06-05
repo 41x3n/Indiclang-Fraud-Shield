@@ -1,10 +1,11 @@
 import { z } from 'zod';
 
+import { Language } from '../../../../../lib/llm/types';
 import { HeuristicKey } from '../../../../../types';
 
 export const FraudAnalysisRequestSchema = z.object({
     message: z.string().min(1, 'Message is required'),
-    userLanguage: z.string().min(2),
+    userLanguage: z.nativeEnum(Language),
     userTags: z
         .array(
             z.enum([

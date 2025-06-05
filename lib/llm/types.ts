@@ -40,3 +40,10 @@ export interface ScamClassificationResult {
     suggestion: string;
     confidence: number;
 }
+
+export interface ExtractedMessageAndTagsResult {
+    message: string;
+    userTags: string[];
+    success: boolean;
+    error: string;
+}
