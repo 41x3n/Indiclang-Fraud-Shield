@@ -16,6 +16,8 @@ const REQUIRED_VARS = [
     'TWILIO_MESSAGE_SCANNING_REQUEST_TEMPLATE_ID',
     'FRAUD_ANALYSIS_API_URL',
     'FRAUD_SCREENSHOT_ANALYSIS_API_URL',
+    'TELEGRAM_BOT_TOKEN',
+    'TELEGRAM_WEBHOOK_URL',
 ] as const;
 
 type RequiredEnv = {
@@ -52,4 +54,6 @@ export const Config = {
         .TWILIO_MESSAGE_SCANNING_REQUEST_TEMPLATE_ID as string,
     fraudAnalysisApiUrl: process.env.FRAUD_ANALYSIS_API_URL as string,
     fraudScreenshotAnalysisApiUrl: process.env.FRAUD_SCREENSHOT_ANALYSIS_API_URL as string,
+    telegramBotToken: process.env.TELEGRAM_BOT_TOKEN as string,
+    telegramWebhookUrl: process.env.TELEGRAM_WEBHOOK_URL as string,
 };
