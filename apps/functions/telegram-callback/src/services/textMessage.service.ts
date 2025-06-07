@@ -42,12 +42,12 @@ export class TelegramTextMessageService {
         if (!isBoarded) {
             logger.log(`User ${telegramId} is not boarded. Triggering onboarding process.`, l_ctx);
             await ctx.reply(
-                'Hi! 👋 I’m IndicLang Fraud Shield — your scam detection assistant.\nForward any suspicious message to me, and I’ll scan it and guide you.\nTo get reports in your preferred language, pick one from below.',
+                '🚨 Scam Alert HQ! I’m IndicLang Fraud Shield, your digital detective.\nThink you’ve spotted something fishy? Forward the message or take a screenshot of your chat on WhatsApp, Telegram, or SMS and send it here — I’ll crack the case!\nPick your language below and let’s bust some scams together!',
             );
 
             await this.userService.updateUser('telegram', telegramId, { isBoarded: true });
 
-            await ctx.reply('Please select your preferred language:', {
+            await ctx.reply('Pick your preferred language to get started:', {
                 reply_markup: {
                     inline_keyboard: [
                         [{ text: Language.English, callback_data: 'lang_' + Language.English }],
@@ -87,7 +87,7 @@ export class TelegramTextMessageService {
 
         logger.log(`Processing text message from ${profileName}: ${text}`, l_ctx);
 
-        await ctx.reply('Do you want to scan this message/screenshot?', {
+        await ctx.reply('Ready to scan this message for scams?', {
             reply_markup: {
                 inline_keyboard: [
                     [

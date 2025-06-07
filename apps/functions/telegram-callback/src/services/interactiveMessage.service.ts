@@ -30,7 +30,7 @@ export class TelegramInteractiveMessageService {
         if (callbackData.startsWith('lang_')) {
             const language = callbackData.replace('lang_', '');
             await this.userService.setPreferredLanguage('telegram', telegramId, language);
-            await ctx.reply(`Your preferred language has been set to ${language}.`);
+            await ctx.reply(`Awesome! You’ll now get scam reports in ${language}.`);
             return;
         }
 
@@ -43,7 +43,7 @@ export class TelegramInteractiveMessageService {
             }
 
             await ctx.reply(
-                'Our Agents are processing your message/image. Please wait a moment...',
+                'Detective Agents are on the case! Analyzing your message now. Hang tight for your scam report...',
             );
 
             const { messageToBeSent } = await this.llmService.getLLMResponse({
@@ -54,7 +54,9 @@ export class TelegramInteractiveMessageService {
 
             ctx.reply(messageToBeSent);
         } else if (callbackData === 'process_no') {
-            await ctx.reply('Okay, not processing this message/image.');
+            await ctx.reply(
+                'No worries! This message or image won’t be scanned. If you have another, just send it my way!',
+            );
         }
     }
 }

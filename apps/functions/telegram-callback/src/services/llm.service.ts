@@ -116,9 +116,9 @@ export class TelegramLLMService {
             const { risk_label, reason, suggestion } = scamClassifierResult;
             let messageToBeSent = '';
             if (risk_label === 'scam') {
-                messageToBeSent = `⚠️ Hi! Our system thinks this message could be a scam.\n\nWhy? ${reason}\n\nWhat should you do? ${suggestion}\n\nPlease be careful and avoid sharing personal or financial information.`;
+                messageToBeSent = `⚠️ Heads up! This looks suspicious and could be a scam.\n\nWhy? ${reason}\n\nWhat should you do? ${suggestion}\n\nStay safe — never share personal or financial info with unknown contacts!`;
             } else {
-                messageToBeSent = `✅ Good news! This message does not appear to be a scam.\n\nWhy? ${reason}\n\nTip: ${suggestion}`;
+                messageToBeSent = `✅ All clear! This message doesn’t seem to be a scam.\n\nWhy? ${reason}\n\nPro tip: ${suggestion}`;
             }
             return {
                 messageToBeSent,
@@ -129,7 +129,8 @@ export class TelegramLLMService {
                 ctx,
             );
             return {
-                messageToBeSent: 'Sorry, I encountered an error while processing your request.',
+                messageToBeSent:
+                    'Oops! Something went wrong while checking your message. Please try again in a bit.',
             };
         }
     }
