@@ -1,11 +1,11 @@
 import axios from 'axios';
 
 import { Config } from '../../../../../lib/config';
+import { MessageService } from '../../../../../lib/db/firebase/services/message.service';
+import { UserService } from '../../../../../lib/db/firebase/services/user.service';
 import { Language } from '../../../../../lib/llm/types';
 import { logger } from '../../../../../lib/logger';
 import { TwilioWhatsAppWebhookPayload } from '../dtos';
-import { MessageService } from '../firebase/services/message.service';
-import { UserService } from '../firebase/services/user.service';
 import { TwilioService } from '../twilio/twilio.service';
 
 export class InteractiveMessageService {

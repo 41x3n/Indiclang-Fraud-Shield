@@ -1,8 +1,8 @@
+import { MessageService } from '../../../../../lib/db/firebase/services/message.service';
+import { UserService } from '../../../../../lib/db/firebase/services/user.service';
 import { logger } from '../../../../../lib/logger';
 import { log_ctx } from '../../../../../types';
 import { TwilioWhatsAppWebhookPayload } from '../dtos';
-import { MessageService } from '../firebase/services/message.service';
-import { UserService } from '../firebase/services/user.service';
 import { TwilioService } from '../twilio/twilio.service';
 
 export class ImageMessageService {

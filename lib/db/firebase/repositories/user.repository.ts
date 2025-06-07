@@ -1,6 +1,6 @@
 import * as admin from 'firebase-admin';
 
-import { Language } from '../../../.././../../lib/llm/types';
+import { Language } from '../../../llm/types';
 import { db } from '../../config/firestore';
 
 export interface User {

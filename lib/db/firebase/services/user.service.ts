@@ -1,4 +1,4 @@
-import { Language } from '../../../../../../lib/llm/types';
+import { Language } from '../../../llm/types';
 import { User, UserRepository } from '../repositories/user.repository';
 
 export class UserService {

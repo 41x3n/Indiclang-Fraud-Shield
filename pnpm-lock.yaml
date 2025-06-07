@@ -11,6 +11,9 @@ importers:
       express:
         specifier: ^5.1.0
         version: 5.1.0
+      firebase-admin:
+        specifier: ^13.4.0
+        version: 13.4.0
       http-status-codes:
         specifier: ^2.3.0
         version: 2.3.0
