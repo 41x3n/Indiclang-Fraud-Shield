@@ -59,8 +59,8 @@ export class InteractiveMessageService {
         return Body.includes('Yes') && ButtonText.includes('Yes') && !!ButtonPayload;
     }
 
-    async setPreferredLanguage(waId: string, listId: string, ctx: any): Promise<void> {
-        ctx.waId = waId;
+    async setPreferredLanguage(waid: string, listId: string, ctx: any): Promise<void> {
+        ctx.waid = waid;
         ctx.listId = listId;
 
         const language = listId.split('_')[2] as Language; // Assuming the listId format is 'language_picker_<language>'
@@ -68,18 +68,18 @@ export class InteractiveMessageService {
             throw new Error(`Invalid listId format: ${listId}`);
         }
 
-        await this.userService.setPreferredLanguage(waId, language);
+        await this.userService.setPreferredLanguage('whatsapp', waid, language);
 
-        logger.log(`Preferred language set for user ${waId}: ${language}`, ctx);
+        logger.log(`Preferred language set for user ${waid}: ${language}`, ctx);
 
         const message = `Your preferred language has been set to ${language}.`;
         await this.twilioService.sendWhatsAppMessage({
-            to: waId,
+            to: waid,
             body: message,
             ctx,
         });
 
-        logger.log(`Confirmation message sent to user ${waId}: ${message}`, ctx);
+        logger.log(`Confirmation message sent to user ${waid}: ${message}`, ctx);
     }
 
     async getLLMResponse({
@@ -95,25 +95,28 @@ export class InteractiveMessageService {
         ctx.WaId = WaId;
 
         try {
-            const messageObjFromDB = await this.messageService.getMessageBySid(messageId);
+            const messageObjFromDB = await this.messageService.getMessageByMessageId(
+                'whatsapp',
+                messageId,
+            );
             if (!messageObjFromDB) {
                 logger.error(`Message with ID ${messageId} not found in database`, ctx);
                 return;
             }
 
-            const { content, waid, imageUrl } = messageObjFromDB;
+            const { content, userId, imageUrl } = messageObjFromDB;
             ctx.content = content;
-            ctx.waid = waid;
+            ctx.waid = userId;
             ctx.imageUrl = imageUrl;
 
-            if (!waid) {
+            if (!userId) {
                 logger.error(`Invalid message object for messageId ${messageId}`, ctx);
                 return;
             }
 
-            const user = await this.userService.getUserByWaid(waid);
+            const user = await this.userService.getUserByUserId('whatsapp', userId);
             if (!user) {
-                logger.error(`User with WaId ${waid} not found`, ctx);
+                logger.error(`User with userId ${userId} not found`, ctx);
                 return;
             }
             ctx.user = user;

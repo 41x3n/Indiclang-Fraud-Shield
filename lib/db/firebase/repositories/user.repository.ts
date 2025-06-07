@@ -3,14 +3,28 @@ import * as admin from 'firebase-admin';
 import { Language } from '../../../llm/types';
 import { db } from '../../config/firestore';
 
+export type MessagingPlatform = 'whatsapp' | 'telegram';
+
 export interface User {
-    waid: string;
-    profileName: string;
+    platform: MessagingPlatform; // 'whatsapp' or 'telegram'
+    userId: string; // WhatsApp waid or Telegram user.id (string for uniformity)
+    username?: string; // Telegram username, if available
+    phoneNumber?: string; // WhatsApp or Telegram phone number, if available
+    profileName?: string; // WhatsApp profileName or Telegram first_name + last_name
     isBoarded: boolean;
     isActive: boolean;
     preferredLanguage: Language;
     createdAt: FirebaseFirestore.Timestamp;
     updatedAt: FirebaseFirestore.Timestamp;
+    telegramData?: {
+        first_name?: string;
+        last_name?: string;
+        language_code?: string;
+        is_bot?: boolean;
+    };
+    whatsappData?: {
+        waid?: string;
+    };
 }
 
 export class UserRepository {
@@ -19,6 +33,7 @@ export class UserRepository {
     constructor() {
         this.collection = db.collection('users');
     }
+
     async create(
         user: Omit<
             User,
@@ -26,35 +41,43 @@ export class UserRepository {
         > &
             Partial<Pick<User, 'isBoarded' | 'isActive' | 'preferredLanguage'>>,
     ) {
-        if (!user.waid || !user.profileName) {
-            throw new Error('waid and profileName are required');
+        if (!user.platform || !user.userId) {
+            throw new Error('platform and userId are required');
         }
         const now = admin.firestore.Timestamp.now();
+        // Remove undefined properties from the user object before saving
         const newUser: User = {
-            waid: user.waid,
-            profileName: user.profileName,
+            platform: user.platform,
+            userId: user.userId,
+            ...(user.username !== undefined ? { username: user.username ?? '' } : {}),
+            ...(user.phoneNumber !== undefined ? { phoneNumber: user.phoneNumber ?? '' } : {}),
+            ...(user.profileName !== undefined ? { profileName: user.profileName ?? '' } : {}),
             isBoarded: user.isBoarded ?? false,
             isActive: user.isActive ?? true,
-            preferredLanguage: Language.English, // Default to English if not provided
+            preferredLanguage: user.preferredLanguage ?? Language.English,
             createdAt: now,
             updatedAt: now,
+            ...(user.telegramData !== undefined ? { telegramData: user.telegramData } : {}),
+            ...(user.whatsappData !== undefined ? { whatsappData: user.whatsappData } : {}),
         };
-        await this.collection.doc(newUser.waid).set(newUser);
+        await this.collection.doc(`${newUser.platform}_${newUser.userId}`).set(newUser);
         return newUser;
     }
 
-    async getByWaid(waid: string): Promise<User | null> {
-        const doc = await this.collection.doc(waid).get();
+    async getByUserId(platform: MessagingPlatform, userId: string): Promise<User | null> {
+        const doc = await this.collection.doc(`${platform}_${userId}`).get();
         return doc.exists ? (doc.data() as User) : null;
     }
 
-    async update(waid: string, data: Partial<User>) {
+    async update(platform: MessagingPlatform, userId: string, data: Partial<User>) {
         const now = admin.firestore.Timestamp.now();
-        await this.collection.doc(waid).update({ ...data, updatedAt: now });
+        await this.collection.doc(`${platform}_${userId}`).update({ ...data, updatedAt: now });
     }
 
-    async delete(waid: string) {
+    async delete(platform: MessagingPlatform, userId: string) {
         const now = admin.firestore.Timestamp.now();
-        await this.collection.doc(waid).update({ isActive: false, updatedAt: now });
+        await this.collection
+            .doc(`${platform}_${userId}`)
+            .update({ isActive: false, updatedAt: now });
     }
 }

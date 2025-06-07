@@ -2,13 +2,39 @@ import * as admin from 'firebase-admin';
 
 import { db } from '../../config/firestore';
 
+export type MessagingPlatform = 'whatsapp' | 'telegram';
+export type MessageType = 'text' | 'image' | 'audio' | 'video' | 'document' | 'other';
+
 export interface Message {
-    messageSid: string; // Twilio MessageSid
-    waid: string; // WhatsApp ID of the user
+    platform: MessagingPlatform; // 'whatsapp' or 'telegram'
+    messageId: string; // WhatsApp MessageSid or Telegram message_id (string for uniformity)
+    userId: string; // WhatsApp waid or Telegram user.id
+    chatId?: string; // Telegram chat.id, if relevant
     content: string;
-    type: 'text' | 'image' | 'audio' | 'video' | 'document' | 'other';
-    imageUrl?: string; // Optional image link
+    type: MessageType;
+    imageUrl?: string;
     receivedAt: FirebaseFirestore.Timestamp;
+    telegramData?: {
+        message_id?: number;
+        chat?: {
+            id: number | string;
+            type: string;
+            title?: string;
+            username?: string;
+        };
+        from?: {
+            id: number | string;
+            is_bot?: boolean;
+            first_name?: string;
+            last_name?: string;
+            username?: string;
+            language_code?: string;
+        };
+    };
+    whatsappData?: {
+        waid?: string;
+        messageSid?: string;
+    };
 }
 
 export class MessageRepository {
@@ -24,16 +50,21 @@ export class MessageRepository {
         return { ...message, receivedAt: now };
     }
 
-    async getMessagesByWaid(waid: string) {
+    async getMessagesByUserId(platform: MessagingPlatform, userId: string) {
         const snapshot = await this.collection
-            .where('waid', '==', waid)
+            .where('platform', '==', platform)
+            .where('userId', '==', userId)
             .orderBy('receivedAt', 'desc')
             .get();
         return snapshot.docs.map((doc) => ({ ...doc.data() })) as Message[];
     }
 
-    async getMessageBySid(messageSid: string) {
-        const snapshot = await this.collection.where('messageSid', '==', messageSid).limit(1).get();
+    async getMessageByMessageId(platform: MessagingPlatform, messageId: string) {
+        const snapshot = await this.collection
+            .where('platform', '==', platform)
+            .where('messageId', '==', messageId)
+            .limit(1)
+            .get();
         if (snapshot.empty) {
             return null;
         }

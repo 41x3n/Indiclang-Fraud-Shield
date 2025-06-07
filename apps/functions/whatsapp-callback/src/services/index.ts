@@ -44,20 +44,22 @@ class WhatsAppCallbackService {
         payload: TwilioWhatsAppWebhookPayload;
         ctx: log_ctx;
     }): Promise<void> {
-        const { WaId, ProfileName, MessageType } = payload;
+        const { WaId, ProfileName, MessageType, MessageSid, Body, MediaUrl0 } = payload;
         if (!WaId || !ProfileName || !MessageType) {
             logger.error('Invalid message received', ctx);
             return;
         }
-        if (payload.WaId) {
+        if (WaId) {
             await this.messageService.saveMessage({
-                waid: WaId,
-                content: payload.Body || '',
-                type: (payload.MessageType as any) || 'text',
-                imageUrl: payload.MediaUrl0 || '',
-                messageSid: payload.MessageSid,
+                platform: 'whatsapp',
+                userId: WaId,
+                content: Body || '',
+                type: (MessageType as any) || 'text',
+                imageUrl: MediaUrl0 || '',
+                messageId: MessageSid,
+                whatsappData: { waid: WaId, messageSid: MessageSid },
             });
-            logger.log(`Message saved for ${ProfileName || WaId}: ${payload.Body}`, ctx);
+            logger.log(`Message saved for ${ProfileName || WaId}: ${Body}`, ctx);
         }
         switch (MessageType) {
             case 'text':
@@ -69,7 +71,6 @@ class WhatsAppCallbackService {
             case 'interactive':
                 await this.interactiveMessageService.handleInteractiveMessage(payload, ctx);
                 break;
-
             default:
                 logger.log(`Unhandled message type: ${MessageType}`, ctx);
         }

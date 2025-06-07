@@ -32,7 +32,12 @@ export class ImageMessageService {
                 ctx,
             );
 
-            const user = await this.userService.createUserIfNotExists(WaId, ProfileName || WaId);
+            const user = await this.userService.createUserIfNotExists({
+                platform: 'whatsapp',
+                userId: WaId,
+                profileName: ProfileName || WaId,
+                whatsappData: { waid: WaId },
+            });
             const isBoarded = this.userService.hasTheUserBeenBoarded(user);
 
             if (!isBoarded) {
@@ -46,7 +51,7 @@ export class ImageMessageService {
                     return;
                 }
                 logger.log(`Onboarding triggered for user ${WaId}`, ctx);
-                await this.userService.updateUser(WaId, { isBoarded: true });
+                await this.userService.updateUser('whatsapp', WaId, { isBoarded: true });
                 return;
             }
 

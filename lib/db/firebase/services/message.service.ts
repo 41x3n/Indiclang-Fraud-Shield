@@ -1,4 +1,4 @@
-import { Message, MessageRepository } from '../repositories/message.repository';
+import { Message, MessageRepository, MessagingPlatform } from '../repositories/message.repository';
 
 export class MessageService {
     private readonly messageRepository: MessageRepository;
@@ -8,32 +8,44 @@ export class MessageService {
     }
 
     async saveMessage({
-        waid,
+        platform,
+        userId,
         content,
         type,
         imageUrl,
-        messageSid,
+        messageId,
+        telegramData,
+        whatsappData,
+        chatId,
     }: {
-        waid: string;
+        platform: MessagingPlatform;
+        userId: string;
         content: string;
         type: Message['type'];
         imageUrl?: string;
-        messageSid: string;
+        messageId: string;
+        telegramData?: Message['telegramData'];
+        whatsappData?: Message['whatsappData'];
+        chatId?: string;
     }) {
         return this.messageRepository.create({
-            waid,
+            platform,
+            userId,
             content,
             type,
             ...(imageUrl ? { imageUrl } : {}),
-            messageSid,
+            messageId,
+            ...(telegramData ? { telegramData } : {}),
+            ...(whatsappData ? { whatsappData } : {}),
+            ...(chatId ? { chatId } : {}),
         });
     }
 
-    async getMessagesForUser(waid: string) {
-        return this.messageRepository.getMessagesByWaid(waid);
+    async getMessagesForUser(platform: MessagingPlatform, userId: string) {
+        return this.messageRepository.getMessagesByUserId(platform, userId);
     }
 
-    async getMessageBySid(messageSid: string) {
-        return this.messageRepository.getMessageBySid(messageSid);
+    async getMessageByMessageId(platform: MessagingPlatform, messageId: string) {
+        return this.messageRepository.getMessageByMessageId(platform, messageId);
     }
 }
