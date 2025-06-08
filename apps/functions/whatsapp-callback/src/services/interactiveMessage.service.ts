@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 import { Config } from '../../../../../lib/config';
+import { AnalysisResultService } from '../../../../../lib/db/firebase/services/analysisResult.service';
 import { MessageService } from '../../../../../lib/db/firebase/services/message.service';
 import { UserService } from '../../../../../lib/db/firebase/services/user.service';
 import { Language } from '../../../../../lib/llm/types';
@@ -12,6 +13,7 @@ export class InteractiveMessageService {
     private readonly userService: UserService;
     private readonly twilioService: TwilioService;
     private readonly messageService: MessageService;
+    private readonly analysisResultService: AnalysisResultService;
 
     constructor(
         userService: UserService,
@@ -21,6 +23,7 @@ export class InteractiveMessageService {
         this.userService = userService;
         this.twilioService = twilioService;
         this.messageService = messageService;
+        this.analysisResultService = new AnalysisResultService();
     }
 
     async handleInteractiveMessage(payload: TwilioWhatsAppWebhookPayload, ctx: any): Promise<void> {
@@ -94,6 +97,7 @@ export class InteractiveMessageService {
         ctx.messageId = messageId;
         ctx.WaId = WaId;
 
+        let analysisRecordBase: any = null;
         try {
             const messageObjFromDB = await this.messageService.getMessageByMessageId(
                 'whatsapp',
@@ -125,42 +129,72 @@ export class InteractiveMessageService {
             ctx.preferredLanguage = preferredLanguage;
             logger.log(`Getting LLM response for messageId ${messageId} and WaId ${WaId}`, ctx);
 
+            let apiPayload: any;
+            let requestRecord: any;
+            if (imageUrl) {
+                apiPayload = {
+                    userLanguage: preferredLanguage,
+                    screenshotUrl: imageUrl,
+                };
+            } else {
+                apiPayload = {
+                    message: content,
+                    userTags: ['from_unknown'],
+                    userLanguage: preferredLanguage,
+                };
+            }
+            requestRecord = { ...apiPayload };
+
+            analysisRecordBase = {
+                source: 'whatsapp',
+                userId,
+                messageId,
+                request: requestRecord,
+                response: { data: null, errorMessage: null, errorCode: null },
+                createdAt: new Date(),
+            };
+            await this.analysisResultService.saveResult(analysisRecordBase);
+
             const response = imageUrl
-                ? await axios.post(
-                      Config.fraudScreenshotAnalysisApiUrl as string,
-                      {
-                          userLanguage: preferredLanguage,
-                          screenshotUrl: imageUrl,
+                ? await axios.post(Config.fraudScreenshotAnalysisApiUrl as string, apiPayload, {
+                      headers: {
+                          'Content-Type': 'application/json',
+                          'x-api-key': Config.apiKey,
                       },
-                      {
-                          headers: {
-                              'Content-Type': 'application/json',
-                              'x-api-key': Config.apiKey,
-                          },
+                  })
+                : await axios.post(Config.fraudAnalysisApiUrl as string, apiPayload, {
+                      headers: {
+                          'Content-Type': 'application/json',
+                          'x-api-key': Config.apiKey,
                       },
-                  )
-                : await axios.post(
-                      Config.fraudAnalysisApiUrl as string,
-                      {
-                          message: content,
-                          userTags: ['from_unknown'],
-                          userLanguage: preferredLanguage,
-                      },
-                      {
-                          headers: {
-                              'Content-Type': 'application/json',
-                              'x-api-key': Config.apiKey,
-                          },
-                      },
-                  );
+                  });
             if (response.status !== 200) {
                 logger.error(`LLM API responded with status ${response.status}`, ctx);
+                await this.analysisResultService.saveResult({
+                    ...analysisRecordBase,
+                    response: {
+                        data: null,
+                        errorMessage: `LLM API responded with status ${response.status}`,
+                        errorCode: 'API_ERROR',
+                    },
+                    createdAt: new Date(),
+                });
                 return;
             }
 
             const llmResponse = response.data;
             ctx.llmResponse = llmResponse;
             logger.log(`LLM response received for messageId ${messageId} and WaId ${WaId}`, ctx);
+
+            await this.analysisResultService.saveResult({
+                ...analysisRecordBase,
+                response: {
+                    data: llmResponse,
+                    errorMessage: null,
+                    errorCode: null,
+                },
+                createdAt: new Date(),
+            });
 
             const scamClassifierResult = llmResponse?.data?.scamClassifierResult;
             if (!scamClassifierResult) {
@@ -190,6 +224,18 @@ export class InteractiveMessageService {
                 error,
                 ...ctx,
             });
+
+            if (analysisRecordBase) {
+                await this.analysisResultService.saveResult({
+                    ...analysisRecordBase,
+                    response: {
+                        data: null,
+                        errorMessage: (error as Error).message,
+                        errorCode: 'EXCEPTION',
+                    },
+                    createdAt: new Date(),
+                });
+            }
         }
     }
 }

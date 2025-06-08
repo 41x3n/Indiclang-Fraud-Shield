@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 import { Config } from '../../../../../lib/config';
+import { AnalysisResultService } from '../../../../../lib/db/firebase/services/analysisResult.service';
 import { MessageService } from '../../../../../lib/db/firebase/services/message.service';
 import { UserService } from '../../../../../lib/db/firebase/services/user.service';
 import { Language } from '../../../../../lib/llm/types';
@@ -8,10 +9,13 @@ import { logger } from '../../../../../lib/logger';
 import { log_ctx } from '../../../../../types/generic';
 
 export class TelegramLLMService {
+    private analysisResultService: AnalysisResultService;
     constructor(
         private userService: UserService,
         private messageService: MessageService,
-    ) {}
+    ) {
+        this.analysisResultService = new AnalysisResultService();
+    }
 
     async getLLMResponse({
         messageId,
@@ -24,6 +28,7 @@ export class TelegramLLMService {
     }): Promise<{ messageToBeSent: string }> {
         ctx.messageId = messageId;
         ctx.telegramId = telegramId;
+        let analysisRecordBase: any = null;
         try {
             const messageObjFromDB = await this.messageService.getMessageByMessageId(
                 'telegram',
@@ -56,37 +61,58 @@ export class TelegramLLMService {
                 `Getting LLM response for messageId ${messageId} and telegramId ${telegramId}`,
                 ctx,
             );
+
+            let apiPayload: any;
+            let requestRecord: any;
+            if (imageUrl) {
+                apiPayload = {
+                    userLanguage: preferredLanguage,
+                    screenshotUrl: imageUrl,
+                };
+            } else {
+                apiPayload = {
+                    message: content,
+                    userTags: ['from_unknown'],
+                    userLanguage: preferredLanguage,
+                };
+            }
+            requestRecord = { ...apiPayload };
+
+            analysisRecordBase = {
+                source: 'telegram',
+                userId,
+                messageId,
+                request: requestRecord,
+                response: { data: null, errorMessage: null, errorCode: null },
+                createdAt: new Date(),
+            };
+            await this.analysisResultService.saveResult(analysisRecordBase);
+
             const response = imageUrl
-                ? await axios.post(
-                      Config.fraudScreenshotAnalysisApiUrl as string,
-                      {
-                          userLanguage: preferredLanguage,
-                          screenshotUrl: imageUrl,
+                ? await axios.post(Config.fraudScreenshotAnalysisApiUrl as string, apiPayload, {
+                      headers: {
+                          'Content-Type': 'application/json',
+                          'x-api-key': Config.apiKey,
                       },
-                      {
-                          headers: {
-                              'Content-Type': 'application/json',
-                              'x-api-key': Config.apiKey,
-                          },
+                  })
+                : await axios.post(Config.fraudAnalysisApiUrl as string, apiPayload, {
+                      headers: {
+                          'Content-Type': 'application/json',
+                          'x-api-key': Config.apiKey,
                       },
-                  )
-                : await axios.post(
-                      Config.fraudAnalysisApiUrl as string,
-                      {
-                          message: content,
-                          userTags: ['from_unknown'],
-                          userLanguage: preferredLanguage,
-                      },
-                      {
-                          headers: {
-                              'Content-Type': 'application/json',
-                              'x-api-key': Config.apiKey,
-                          },
-                      },
-                  );
+                  });
 
             if (response.status !== 200) {
                 logger.error(`LLM API responded with status ${response.status}`);
+                await this.analysisResultService.saveResult({
+                    ...analysisRecordBase,
+                    response: {
+                        data: null,
+                        errorMessage: `LLM API responded with status ${response.status}`,
+                        errorCode: 'API_ERROR',
+                    },
+                    createdAt: new Date(),
+                });
                 throw new Error('LLM API responded with an error');
             }
 
@@ -101,8 +127,28 @@ export class TelegramLLMService {
                     `Invalid LLM response for messageId ${messageId} and telegramId ${telegramId}`,
                     ctx,
                 );
+
+                await this.analysisResultService.saveResult({
+                    ...analysisRecordBase,
+                    response: {
+                        data: null,
+                        errorMessage: 'Invalid LLM response',
+                        errorCode: 'INVALID_RESPONSE',
+                    },
+                    createdAt: new Date(),
+                });
                 throw new Error('Invalid LLM response');
             }
+
+            await this.analysisResultService.saveResult({
+                ...analysisRecordBase,
+                response: {
+                    data: llmResponse,
+                    errorMessage: null,
+                    errorCode: null,
+                },
+                createdAt: new Date(),
+            });
 
             const scamClassifierResult = llmResponse?.data?.scamClassifierResult;
             if (!scamClassifierResult) {
@@ -128,6 +174,18 @@ export class TelegramLLMService {
                 `Error getting LLM response for messageId ${messageId} and telegramId ${telegramId}: ${error}`,
                 ctx,
             );
+
+            if (analysisRecordBase) {
+                await this.analysisResultService.saveResult({
+                    ...analysisRecordBase,
+                    response: {
+                        data: null,
+                        errorMessage: (error as Error).message,
+                        errorCode: 'EXCEPTION',
+                    },
+                    createdAt: new Date(),
+                });
+            }
             return {
                 messageToBeSent:
                     'Oops! Something went wrong while checking your message. Please try again in a bit.',
