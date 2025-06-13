@@ -1,5 +1,6 @@
 import { MessageService } from '../../../../../lib/db/firebase/services/message.service';
 import { UserService } from '../../../../../lib/db/firebase/services/user.service';
+import { UserQuotaService } from '../../../../../lib/db/firebase/services/userQuota.service';
 import { logger } from '../../../../../lib/logger';
 import { log_ctx } from '../../../../../types';
 import { TwilioWhatsAppWebhookPayload } from '../dtos';
@@ -9,15 +10,18 @@ export class TextMessageService {
     private readonly userService: UserService;
     private readonly twilioService: TwilioService;
     private readonly messageService: MessageService;
+    private readonly userQuotaService: UserQuotaService;
 
     constructor(
         userService: UserService,
         twilioService: TwilioService,
         messageService: MessageService,
+        userQuotaService: UserQuotaService,
     ) {
         this.userService = userService;
         this.twilioService = twilioService;
         this.messageService = messageService;
+        this.userQuotaService = userQuotaService;
     }
 
     async handleTextMessage(payload: TwilioWhatsAppWebhookPayload, ctx: log_ctx): Promise<void> {
@@ -49,6 +53,34 @@ export class TextMessageService {
                 }
                 logger.log(`Onboarding triggered for user ${WaId}`, ctx);
                 await this.userService.updateUser('whatsapp', WaId, { isBoarded: true });
+                return;
+            }
+
+            if (
+                Body.toLowerCase().includes('quota') ||
+                Body.toLowerCase().includes('limit') ||
+                Body.toLowerCase().includes('usage')
+            ) {
+                try {
+                    await this.userQuotaService.initializeQuotaForExistingUser('whatsapp', WaId);
+                    const quotaStatus = await this.userQuotaService.getQuotaStatus(
+                        'whatsapp',
+                        WaId,
+                    );
+                    const quotaMessage = this.userQuotaService.formatQuotaMessage(quotaStatus);
+                    await this.twilioService.sendWhatsAppMessage({
+                        to: WaId,
+                        body: quotaMessage,
+                        ctx,
+                    });
+                } catch (error) {
+                    logger.error('Error getting quota status', { error, ...ctx });
+                    await this.twilioService.sendWhatsAppMessage({
+                        to: WaId,
+                        body: "Sorry, I couldn't check your quota status right now. Please try again later.",
+                        ctx,
+                    });
+                }
                 return;
             }
 

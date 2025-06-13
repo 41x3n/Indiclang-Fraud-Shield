@@ -6,6 +6,14 @@ import { logger } from '../../../../../lib/logger';
 import { log_ctx } from '../../../../../types/generic';
 
 export class TelegramImageMessageService {
+    private readonly scamPromptMessages: string[] = [
+        "🧐 Ready to scan this image for scams? Let's check it out!",
+        '🕵️‍♀️ Shall we investigate this image for potential scams? Confirm to proceed!',
+        '🔎 Thinking this might be a scam? I can analyze it for you. Proceed?',
+        '🛡️ Want to check if this image is safe? Let me scan it for scams!',
+        '🚨 Suspicious image? I can help! Ready to scan for scams?',
+    ];
+
     constructor(
         private userService: UserService,
         private messageService: MessageService,
@@ -91,9 +99,11 @@ export class TelegramImageMessageService {
             return;
         }
 
-        logger.log(`Processing image message from ${profileName}`, l_ctx);
+        logger.log('Image message processed and saved successfully', l_ctx);
 
-        await ctx.reply('Ready to scan this message for scams?', {
+        const randomScamPrompt =
+            this.scamPromptMessages[Math.floor(Math.random() * this.scamPromptMessages.length)];
+        await ctx.reply(randomScamPrompt, {
             reply_markup: {
                 inline_keyboard: [
                     [

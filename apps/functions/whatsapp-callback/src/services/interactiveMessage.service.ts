@@ -4,6 +4,7 @@ import { Config } from '../../../../../lib/config';
 import { AnalysisResultService } from '../../../../../lib/db/firebase/services/analysisResult.service';
 import { MessageService } from '../../../../../lib/db/firebase/services/message.service';
 import { UserService } from '../../../../../lib/db/firebase/services/user.service';
+import { UserQuotaService } from '../../../../../lib/db/firebase/services/userQuota.service';
 import { Language } from '../../../../../lib/llm/types';
 import { logger } from '../../../../../lib/logger';
 import { TwilioWhatsAppWebhookPayload } from '../dtos';
@@ -14,6 +15,7 @@ export class InteractiveMessageService {
     private readonly twilioService: TwilioService;
     private readonly messageService: MessageService;
     private readonly analysisResultService: AnalysisResultService;
+    private readonly userQuotaService: UserQuotaService;
 
     constructor(
         userService: UserService,
@@ -24,6 +26,7 @@ export class InteractiveMessageService {
         this.twilioService = twilioService;
         this.messageService = messageService;
         this.analysisResultService = new AnalysisResultService();
+        this.userQuotaService = new UserQuotaService();
     }
 
     async handleInteractiveMessage(payload: TwilioWhatsAppWebhookPayload, ctx: any): Promise<void> {
@@ -125,6 +128,26 @@ export class InteractiveMessageService {
             }
             ctx.user = user;
 
+            await this.userQuotaService.initializeQuotaForExistingUser('whatsapp', userId);
+
+            const quotaCheck = await this.userQuotaService.checkQuotaAndUpdate('whatsapp', userId);
+            if (!quotaCheck.hasQuota) {
+                logger.warn(`User ${userId} has exceeded weekly quota`, {
+                    ...ctx,
+                    quotaStatus: quotaCheck,
+                });
+
+                const quotaStatus = await this.userQuotaService.getQuotaStatus('whatsapp', userId);
+                const quotaMessage = this.userQuotaService.formatQuotaMessage(quotaStatus);
+
+                await this.twilioService.sendWhatsAppMessage({
+                    to: WaId,
+                    body: quotaMessage,
+                    ctx,
+                });
+                return;
+            }
+
             const preferredLanguage = user.preferredLanguage || Language.English;
             ctx.preferredLanguage = preferredLanguage;
             logger.log(`Getting LLM response for messageId ${messageId} and WaId ${WaId}`, ctx);
@@ -219,6 +242,21 @@ export class InteractiveMessageService {
                 body: messageToBeSent,
                 ctx,
             });
+
+            await this.userQuotaService.incrementUsage('whatsapp', userId);
+            logger.log(`Incremented weekly quota for user ${userId}`, ctx);
+
+            try {
+                const quotaStatus = await this.userQuotaService.getQuotaStatus('whatsapp', userId);
+                const quotaMessage = `📊 ${quotaStatus.remainingQuota} scans remaining this week (${quotaStatus.currentUsage}/${quotaStatus.limit} used)`;
+                await this.twilioService.sendWhatsAppMessage({
+                    to: WaId,
+                    body: quotaMessage,
+                    ctx,
+                });
+            } catch (error) {
+                logger.error('Error showing quota status after analysis', { error, ...ctx });
+            }
         } catch (error) {
             logger.error(`Error getting LLM response for messageId ${messageId} and WaId ${WaId}`, {
                 error,

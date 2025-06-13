@@ -16,6 +16,9 @@ export interface User {
     preferredLanguage: Language;
     createdAt: FirebaseFirestore.Timestamp;
     updatedAt: FirebaseFirestore.Timestamp;
+    // Weekly quota tracking
+    weeklyScamAnalysisCount: number; // Current week's scam analysis count
+    weeklyQuotaResetDate: FirebaseFirestore.Timestamp; // Date when weekly quota should reset
     telegramData?: {
         first_name?: string;
         last_name?: string;
@@ -37,7 +40,13 @@ export class UserRepository {
     async create(
         user: Omit<
             User,
-            'createdAt' | 'updatedAt' | 'isBoarded' | 'isActive' | 'preferredLanguage'
+            | 'createdAt'
+            | 'updatedAt'
+            | 'isBoarded'
+            | 'isActive'
+            | 'preferredLanguage'
+            | 'weeklyScamAnalysisCount'
+            | 'weeklyQuotaResetDate'
         > &
             Partial<Pick<User, 'isBoarded' | 'isActive' | 'preferredLanguage'>>,
     ) {
@@ -45,6 +54,11 @@ export class UserRepository {
             throw new Error('platform and userId are required');
         }
         const now = admin.firestore.Timestamp.now();
+        // Calculate next week's reset date (current date + 7 days)
+        const nextWeek = new Date();
+        nextWeek.setDate(nextWeek.getDate() + 7);
+        const weeklyQuotaResetDate = admin.firestore.Timestamp.fromDate(nextWeek);
+
         // Remove undefined properties from the user object before saving
         const newUser: User = {
             platform: user.platform,
@@ -55,6 +69,8 @@ export class UserRepository {
             isBoarded: user.isBoarded ?? false,
             isActive: user.isActive ?? true,
             preferredLanguage: user.preferredLanguage ?? Language.English,
+            weeklyScamAnalysisCount: 0,
+            weeklyQuotaResetDate,
             createdAt: now,
             updatedAt: now,
             ...(user.telegramData !== undefined ? { telegramData: user.telegramData } : {}),

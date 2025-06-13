@@ -1,5 +1,6 @@
 import { MessageService } from '../../../../../lib/db/firebase/services/message.service';
 import { UserService } from '../../../../../lib/db/firebase/services/user.service';
+import { UserQuotaService } from '../../../../../lib/db/firebase/services/userQuota.service';
 import { TelegramImageMessageService } from './imageMessage.service';
 import { TelegramInteractiveMessageService } from './interactiveMessage.service';
 import { TelegramTextMessageService } from './textMessage.service';
@@ -10,13 +11,16 @@ export class TelegramCallbackService {
     private textMessageService: TelegramTextMessageService;
     private imageMessageService: TelegramImageMessageService;
     private interactiveMessageService: TelegramInteractiveMessageService;
+    private userQuotaService: UserQuotaService;
 
     constructor() {
         this.userService = new UserService();
+        this.userQuotaService = new UserQuotaService();
         this.messageService = new MessageService();
         this.textMessageService = new TelegramTextMessageService(
             this.userService,
             this.messageService,
+            this.userQuotaService,
         );
         this.imageMessageService = new TelegramImageMessageService(
             this.userService,

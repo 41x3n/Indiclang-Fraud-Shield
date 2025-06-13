@@ -1,5 +1,6 @@
 import { MessageService } from '../../../../../lib/db/firebase/services/message.service';
 import { UserService } from '../../../../../lib/db/firebase/services/user.service';
+import { UserQuotaService } from '../../../../../lib/db/firebase/services/userQuota.service';
 import { logger } from '../../../../../lib/logger';
 import { log_ctx } from '../../../../../types/index';
 import { TwilioWhatsAppWebhookPayload } from '../dtos';
@@ -15,15 +16,18 @@ class WhatsAppCallbackService {
     private userService: UserService;
     private twilioService: TwilioService;
     private messageService: MessageService;
+    private userQuotaService: UserQuotaService;
 
     constructor() {
         this.userService = new UserService();
         this.twilioService = new TwilioService();
         this.messageService = new MessageService();
+        this.userQuotaService = new UserQuotaService();
         this.textMessageService = new TextMessageService(
             this.userService,
             this.twilioService,
             this.messageService,
+            this.userQuotaService,
         );
         this.imageMessageService = new ImageMessageService(
             this.userService,
