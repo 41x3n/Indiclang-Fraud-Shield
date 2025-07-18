@@ -1,114 +1,95 @@
-# Indiclang Fraud Shield
+# 🚨 IndicLang Fraud Shield
 
-Indiclang Fraud Shield is a lightweight, multilingual scam detection assistant for WhatsApp and Telegram. Users can forward suspicious messages or screenshots, and the system responds in their preferred Indian language with a clear verdict—"Scam," "Maybe," or "Safe"—along with reasoning and advice. The platform combines rule-based heuristics with Google's Gemini LLM for nuanced language analysis and localization, supporting major Indian languages including Hindi, Bengali, Gujarati, Kannada, Malayalam, Marathi, Telugu, Tamil, Urdu, and English.
+A lightweight, multilingual scam detection bot for **Telegram**. Built for India, powered by AI.
 
-> **Note:** This project was originally built for the **AI in Action hackathon** and was required to be developed and hosted on GitLab. This repository is a clone for sharing and future development on GitHub. All future features and updates will be added here.
+Users can forward suspicious texts or screenshots, and get a **verdict** (“Scam,” “Maybe,” or “Safe”) with **reasons and advice** in their own language.
 
-**Want to see it in action? Try out the [Telegram Bot](https://t.me/IndicLangBot)!**
+### 🧠 How It Works
 
-## Inspiration
+- ✅ **Rule-based heuristics** detect UPI IDs, urgent phrases, scam links, and more.
+- 🤖 **Gemini LLM** analyzes the tone, language, and subtle cues across Indian languages.
+- 🗣️ Final output is translated into the user’s preferred language.
 
-In India, messaging scams are rampant, especially targeting non-English speakers and older adults. Indiclang Fraud Shield was created to empower users to verify suspicious messages in their own language, leveraging AI and rules to provide instant, accessible help.
+> Built for the *AI in Action Hackathon* (GitLab x Google Cloud). This repo is the GitHub mirror for ongoing development.
 
-## Features
 
-- **Multilingual Support:** Detects scams and explains risks in 10+ Indian languages.
-- **Hybrid AI Approach:** Combines rule-based heuristics (for patterns like UPI IDs, suspicious links, urgent phrases) with Gemini LLM for deep language understanding.
-- **Screenshot Analysis:** Uses Google OCR to extract text from images for scam detection.
-- **Personalized Responses:** Translates results and advice into the user's preferred language.
-- **Cloud-Native:** Runs on Google Cloud Functions with Firestore for storage.
-- **Bots for WhatsApp & Telegram:** Seamless integration with both platforms.
-- **CI/CD:** Automated deployments via GitLab CI/CD.
-- **Extensible:** Modular codebase for easy addition of new heuristics, languages, or platforms.
 
-## Project Structure
+### 🔑 Features
+
+- 🗣️ Supports 9+ Indian languages: Hindi, Bengali, Tamil, Telugu, Urdu, Kannada, Malayalam, Marathi, Gujarati, English
+- 🧩 Handles **screenshots** using Google OCR
+- ☁️ Runs on **Google Cloud Functions** (fully serverless)
+- 📦 **Modular codebase** using TypeScript and pnpm
+- 🔁 GitLab **CI/CD** pipelines
+- 📲 [Try the Telegram Bot](https://t.me/IndicLangBot)
+
+
+### 📁 Repo Layout
 
 ```
-.
-├── apps/
-│   └── functions/
-│       ├── fraud-analysis/
-│       ├── telegram-callback/
-│       └── whatsapp-callback/
-├── lib/
-│   ├── config.ts
-│   ├── error.ts
-│   ├── logger.ts
-│   └── db/
-├── types/
-│   ├── errors.ts
-│   ├── generic.ts
-│   ├── heuristic.ts
-│   ├── index.ts
-│   └── response.ts
-├── .gitlab/
-│   └── ci/
-├── dev.ts
-├── package.json
-├── pnpm-workspace.yaml
-├── tsconfig.json
-└── README.md
+apps/functions/        → Cloud Functions: fraud-analysis, telegram, whatsapp
+lib/                   → Shared modules (LLM, Firestore, logging)
+types/                 → TypeScript types and enums
+.gitlab/ci/            → CI/CD pipeline definitions
 ```
 
-- **apps/functions/**: Cloud function source code for each service (fraud analysis, Telegram, WhatsApp).
-- **lib/**: Shared libraries (config, logging, database, LLM, middleware).
-- **types/**: Shared TypeScript types and interfaces.
-- **.gitlab/ci/**: GitLab CI/CD pipeline definitions.
-- **dev.ts**: Local development entry point.
 
-## How It Works
 
-1. **User forwards a message or screenshot** to the bot (WhatsApp/Telegram).
-2. **Heuristics engine** checks for obvious scam patterns.
-3. **Gemini LLM** analyzes the message for nuanced or context-based scams, using few-shot prompting and heuristics as context.
-4. **OCR pipeline** extracts text from images if needed.
-5. **Final verdict** is a blend of heuristic and LLM output, translated to the user's language.
-6. **Response** includes a verdict, reasoning, and actionable advice.
+### 🔍 What Happens When You Use It
 
-## Getting Started
+1. You send a message or screenshot to the bot  
+2. It runs **heuristics** to find obvious scam indicators  
+3. Then it calls **Gemini LLM** with examples + context  
+4. The system blends both scores for a **final verdict**  
+5. Response is **localized** with reasoning + suggestion  
 
-### Prerequisites
+---
 
-- [Node.js](https://nodejs.org/) (v18+ recommended)
-- [pnpm](https://pnpm.io/) (v10+)
-- Google Cloud SDK (for deployment)
-- Firebase project and credentials
+## 🚀 Getting Started
 
-### Installation
+### 🔧 Requirements
 
-```sh
+- [Node.js](https://nodejs.org/) v18+
+- [pnpm](https://pnpm.io/) v10+
+- Google Cloud SDK
+- Firebase project + credentials
+
+
+
+### 📦 Setup
+
+```bash
 git clone https://github.com/your-org/indiclang-fraud-shield.git
 cd indiclang-fraud-shield
 pnpm install
 ```
 
-### Build
+To build the project:
 
-```sh
+```bash
 pnpm -r run build
 ```
 
-### Development
+To run locally (all functions):
 
-```sh
-pnpm dev
+```bash
+pnpm run start
 ```
 
-This runs all functions locally using the Functions Framework.
+Linting and formatting:
 
-### Linting & Formatting
-
-```sh
+```bash
 pnpm lint
 pnpm format
 ```
 
-### Deployment
 
-Each function can be deployed individually using the provided GitLab CI pipelines or manually via the Google Cloud CLI. Example for fraud-analysis:
 
-```sh
+### ☁️ Deployment (Example: fraud-analysis)
+
+```bash
 pnpm --filter fraud-analysis run build
+
 gcloud functions deploy fraudAnalysis \
   --gen2 \
   --entry-point=defaultHandler \
@@ -116,32 +97,30 @@ gcloud functions deploy fraudAnalysis \
   --trigger-http \
   --source=apps/functions/fraud-analysis/dist \
   --allow-unauthenticated
+  --set-env-vars {ENVS}
 ```
 
-See `.gitlab/ci/*.yml` for full deployment scripts.
+> Full CI pipeline configs in `.gitlab/ci/*.yml`
 
-## Configuration
 
-- Environment variables are used for API keys, tokens, and URLs.
-- See `.gitignore` for ignored secrets and config files.
 
-## Roadmap
+### ⚙️ Configuration
 
-- Add feedback loop to improve classification over time
-- Support more Indian scripts and dialects
-- Publish a dashboard for analytics and tuning
-
-## License
-
-ISC
+- Uses `.env` or Secret Manager for credentials, tokens, etc.
+- See `.gitignore` for excluded sensitive files
 
 ---
 
-**Contributions and issues are welcome!**
+## 📄 License
 
-If you'd like to contribute, please email me or raise a discussion first before opening a pull request.
+[ISC](https://opensource.org/licenses/ISC)
 
----
 
-- [Telegram Bot](https://t.me/IndicLangBot)
-- [Devpost Project Page](https://devpost.com/software/indiclang-fraud-shield)
+
+## 🤝 Contributing
+
+🔧 Devs Welcome: Fork, clone, or raise issues. Contributions and feedback are appreciated!
+
+
+
+- 🧪 [Try the Telegram Bot](https://t.me/IndicLangBot)  
